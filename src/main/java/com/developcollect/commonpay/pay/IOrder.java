@@ -28,12 +28,16 @@ public interface IOrder<SOURCE> {
     /**
      * 订单开始时间
      */
-    LocalDateTime getTimeStart();
+    default LocalDateTime getTimeStart() {
+        return null;
+    }
 
     /**
      * 订单过期时间
      */
-    LocalDateTime getTimeExpire();
+    default LocalDateTime getTimeExpire() {
+        return null;
+    }
 
     /**
      * 支付平台

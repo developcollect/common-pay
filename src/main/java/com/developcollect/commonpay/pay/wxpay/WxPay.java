@@ -1,7 +1,6 @@
 package com.developcollect.commonpay.pay.wxpay;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.developcollect.commonpay.PayPlatform;
@@ -11,7 +10,6 @@ import com.developcollect.commonpay.pay.*;
 import com.developcollect.commonpay.pay.wxpay.sdk.WXPay;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,12 +46,13 @@ public class WxPay extends AbstractPay {
         // 这个ip好像可以随便填
         reqData.put("spbill_create_ip", "117.43.68.32");
         reqData.put("trade_type", TRADE_TYPE);
-        reqData.put("time_start", DateUtil.format(order.getTimeStart(), "yyyyMMddHHmmss"));
-        // time_expire只能第一次下单传值，不允许二次修改，二次修改系统将报错。
-        File orderFlgFile = new File(FileUtil.getTmpDir(), order.getOutTradeNo() + ".order");
-        if (!orderFlgFile.exists()) {
+        if (order.getTimeStart() != null) {
+            reqData.put("time_start", DateUtil.format(order.getTimeStart(), "yyyyMMddHHmmss"));
+        }
+        // time_expire只能第一次下单传值，不允许二次修改，二次修改微信接口将报错。
+        // 目前根据订单中是否有微信支付订单号判断是否已下单
+        if (order.getTimeExpire() != null && order.getTradeNo() == null) {
             reqData.put("time_expire", DateUtil.format(order.getTimeExpire(), "yyyyMMddHHmmss"));
-            FileUtil.touch(orderFlgFile);
         }
 
         return reqData;
@@ -104,6 +103,13 @@ public class WxPay extends AbstractPay {
         throw new PayException("微信支付不支持跳转到form表单支付");
     }
 
+    /**
+     * 微信扫码支付
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_1
+     *
+     * @param order
+     * @return java.lang.String
+     */
     @Override
     public String payQrCode(IOrder order) {
         try {
