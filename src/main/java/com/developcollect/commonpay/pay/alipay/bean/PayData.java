@@ -1,7 +1,10 @@
 package com.developcollect.commonpay.pay.alipay.bean;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.developcollect.commonpay.PayPlatform;
+import com.developcollect.commonpay.config.GlobalConfig;
 import com.developcollect.commonpay.pay.IOrder;
 import lombok.Data;
 
@@ -70,7 +73,9 @@ public class PayData implements Serializable {
         payData.setBody("商品_" + order.getOutTradeNo());
         payData.setTotalAmount(order.getTotalFee());
         // FIXME: 2020/1/9 沙箱环境加了这个参数后导致   订单信息无法识别,建议联系卖家。错误码:INVALID_PARAMETER
-        // payData.setTimeExpire(DateUtil.format(order.getTimeExpire()));
+        if (GlobalConfig.getPayConfig(PayPlatform.ALI_PAY).isDebug() == false) {
+            payData.setTimeExpire(DateUtil.format(order.getTimeExpire(), "yyyy-MM-dd HH:mm:ss"));
+        }
         return payData;
     }
 

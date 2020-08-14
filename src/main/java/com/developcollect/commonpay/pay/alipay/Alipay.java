@@ -85,12 +85,11 @@ public class Alipay extends AbstractPay {
 //    private volatile AlipayClient alipayClient;
 
     /**
+     * 支付宝预下单扫码支付
      * https://docs.open.alipay.com/api_1/alipay.trade.precreate
      *
      * @param order
      * @return java.lang.String
-     * @author zak
-     * @date 2020/3/11 14:56
      */
     @Override
     public String payQrCode(IOrder order) {
@@ -127,6 +126,13 @@ public class Alipay extends AbstractPay {
         }
     }
 
+    /**
+     * 支付宝统一收单下单并支付页面
+     * https://opendocs.alipay.com/apis/api_1/alipay.trade.page.pay
+     *
+     * @param order
+     * @return java.lang.String
+     */
     @Override
     public String payForm(IOrder order) {
         try {
