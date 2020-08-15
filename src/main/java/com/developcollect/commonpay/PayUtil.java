@@ -4,6 +4,7 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.developcollect.commonpay.config.AbstractPayConfig;
 import com.developcollect.commonpay.config.GlobalConfig;
+import com.developcollect.commonpay.exception.PayException;
 import com.developcollect.commonpay.pay.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -113,6 +114,10 @@ public class PayUtil {
      * @since 1.0.0
      */
     public static String payWapForm(IOrder order) {
+        if (order.getPayPlatform() == PayPlatform.WX_PAY) {
+            // 微信是直接返回的url, 没有返回html代码的接口
+            throw new PayException("暂不支持返回WAP页面代码");
+        }
         Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
         String form = pay.payWapForm(order);
         return form;
@@ -130,6 +135,11 @@ public class PayUtil {
      */
     public static String payWapFormAccessUrl(IOrder order) {
         String form = payWapForm(order);
+        if (order.getPayPlatform() == PayPlatform.WX_PAY) {
+            // 微信是直接返回的url, 不需要通过访问链接生成器生成
+            return form;
+        }
+
         String accessUrl = GlobalConfig
                 .getPayConfig(order.getPayPlatform())
                 .getWapPayFormHtmlAccessUrlGenerator()
@@ -186,6 +196,13 @@ public class PayUtil {
     public static RefundResponse refundSync(IOrder order, IRefund refund) {
         Pay pay = GlobalConfig.payFactory().createPay(refund.getPayPlatform());
         RefundResponse refundResponse = pay.refundSync(order, refund);
+        if (GlobalConfig.refundBroadcaster() != null) {
+            // 如果广播失败了不会重试
+            boolean broadcast = GlobalConfig.refundBroadcaster().broadcast(refundResponse);
+            if (!broadcast) {
+                log.error("退款[{}]结果广播失败", refund.getOutRefundNo());
+            }
+        }
         return refundResponse;
     }
 
@@ -202,6 +219,14 @@ public class PayUtil {
     public static TransferResponse transferSync(ITransfer transfer) {
         Pay pay = GlobalConfig.payFactory().createPay(transfer.getPayPlatform());
         TransferResponse transferResponse = pay.transferSync(transfer);
+
+        if (GlobalConfig.transferBroadcaster() != null) {
+            // 如果广播失败了不会重试
+            boolean broadcast = GlobalConfig.transferBroadcaster().broadcast(transferResponse);
+            if (!broadcast) {
+                log.error("转账[{}]结果广播失败", transfer.getOutTransferNo());
+            }
+        }
         return transferResponse;
     }
 

@@ -40,6 +40,18 @@ public interface Pay {
      */
     String payWapForm(IOrder order);
 
+
+    /**
+     * 在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
+     * 仅微信支持
+     *
+     * @param order
+     * @return void
+     * @author Zhu Kaixiao
+     * @date 2020/8/15 13:49
+     */
+    WxJsPayResult wxJsPay(IOrder order);
+
     /**
      * 同步调用支付
      * 直接返回支付结果，不使用异步通知的方式

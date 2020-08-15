@@ -2,12 +2,15 @@ package com.developcollect.commonpay.pay.wxpay;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.developcollect.commonpay.PayPlatform;
 import com.developcollect.commonpay.config.WxPayConfig;
 import com.developcollect.commonpay.exception.PayException;
 import com.developcollect.commonpay.pay.*;
 import com.developcollect.commonpay.pay.wxpay.sdk.WXPay;
+import com.developcollect.commonpay.pay.wxpay.sdk.WXPayConstants;
+import com.developcollect.commonpay.pay.wxpay.sdk.WXPayUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
@@ -24,8 +27,6 @@ import java.util.Map;
 @Slf4j
 public class WxPay extends AbstractPay {
 
-    private static final String TRADE_TYPE = "NATIVE";
-
 
     private WXPay getWxSdkPay(WxPayConfig wxPayConfig) {
         DefaultWXPayConfig wxSdkConfig = new DefaultWXPayConfig();
@@ -37,7 +38,7 @@ public class WxPay extends AbstractPay {
         return wxPay;
     }
 
-    private Map<String, String> convertToPayReqMap(IOrder order) {
+    private Map<String, String> convertToPayReqMap(IOrder order, String tradeType) {
         Map<String, String> reqData = new HashMap<>(16);
         reqData.put("body", "商品_" + order.getOutTradeNo());
         reqData.put("out_trade_no", order.getOutTradeNo());
@@ -45,7 +46,7 @@ public class WxPay extends AbstractPay {
         reqData.put("total_fee", String.valueOf(order.getTotalFee()));
         // 这个ip好像可以随便填
         reqData.put("spbill_create_ip", "117.43.68.32");
-        reqData.put("trade_type", TRADE_TYPE);
+        reqData.put("trade_type", tradeType);
         if (order.getTimeStart() != null) {
             reqData.put("time_start", DateUtil.format(order.getTimeStart(), "yyyyMMddHHmmss"));
         }
@@ -99,6 +100,40 @@ public class WxPay extends AbstractPay {
     }
 
     /**
+     * 微信统一下单
+     *
+     * @param order       订单
+     * @param wxPayConfig 微信支付配置
+     * @param tradeType   交易类型
+     *                    JSAPI -JSAPI支付
+     *                    NATIVE -Native支付
+     *                    APP -APP支付
+     * @return java.util.Map<java.lang.String, java.lang.String>
+     * @author Zhu Kaixiao
+     * @date 2020/8/15 14:18
+     */
+    private Map<String, String> unifiedOrder(IOrder order, WxPayConfig wxPayConfig, String tradeType) throws Exception {
+
+        WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
+        Map<String, String> reqData = convertToPayReqMap(order, tradeType);
+        reqData.put("notify_url", wxPayConfig.getPayNotifyUrlGenerator().apply(order));
+
+        if (log.isDebugEnabled()) {
+            log.debug("微信支付参数:{}", JSONObject.toJSONString(reqData));
+        }
+
+        Map<String, String> map = wxSdkPay.unifiedOrder(reqData);
+
+        if ("FAIL".equals(map.get("return_code"))) {
+            throw new PayException(map.get("return_msg"));
+        }
+        if ("FAIL".equals(map.get("result_code"))) {
+            throw new PayException(map.get("err_code_des"));
+        }
+        return map;
+    }
+
+    /**
      * 微信扫码支付
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_1
      *
@@ -109,32 +144,81 @@ public class WxPay extends AbstractPay {
     public String payQrCode(IOrder order) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
+            Map<String, String> map = unifiedOrder(order, wxPayConfig, "NATIVE");
 
-            Map<String, String> reqData = convertToPayReqMap(order);
-            reqData.put("notify_url", wxPayConfig.getPayNotifyUrlGenerator().apply(order));
-
-            if (log.isDebugEnabled()) {
-                log.debug("微信支付参数:{}", JSONObject.toJSONString(reqData));
-            }
-
-            Map<String, String> map = wxSdkPay.unifiedOrder(reqData);
-
-            if ("FAIL".equals(map.get("return_code"))) {
-                throw new PayException(map.get("return_msg"));
-            }
-            if ("FAIL".equals(map.get("result_code"))) {
-                throw new PayException(map.get("err_code_des"));
-            }
             String codeUrl = map.get("code_url");
             log.debug("微信支付,code_url: {}", codeUrl);
-//            QrCodeUtil.generate(codeUrl, 300, 300, qrCodeFile);
             return codeUrl;
         } catch (Throwable throwable) {
             log.error("微信支付失败");
             throw throwable instanceof PayException
                     ? (PayException) throwable
                     : new PayException("微信支付失败", throwable);
+        }
+    }
+
+    /**
+     * 微信js支付
+     * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
+     *
+     * @param order
+     * @return com.developcollect.commonpay.pay.WxJsPayResult
+     */
+    @Override
+    public WxJsPayResult wxJsPay(IOrder order) {
+        try {
+            WxPayConfig wxPayConfig = getPayConfig();
+            Map<String, String> map = unifiedOrder(order, wxPayConfig, "JSAPI");
+            String prepayId = map.get("prepay_id");
+
+            Map<String, String> wxJsPayMap = new HashMap<>();
+            wxJsPayMap.put("package", "prepay_id=" + prepayId);
+            wxJsPayMap.put("appid", wxPayConfig.getAppId());
+            wxJsPayMap.put("nonce_str", WXPayUtil.generateNonceStr());
+            wxJsPayMap.put("timeStamp", String.valueOf((System.currentTimeMillis() / 1000)));
+            wxJsPayMap.put("sign_type", wxPayConfig.isDebug() ? WXPayConstants.MD5 : WXPayConstants.HMACSHA256);
+            wxJsPayMap.put("sign", WXPayUtil.generateSignature(wxJsPayMap, wxPayConfig.getKey(),
+                    wxPayConfig.isDebug() ? WXPayConstants.SignType.MD5 : WXPayConstants.SignType.HMACSHA256));
+            wxJsPayMap.put("prepay_id", prepayId);
+
+            WxJsPayResult wxJsPayResult = WxJsPayResult.of(wxJsPayMap);
+            return wxJsPayResult;
+        } catch (Throwable throwable) {
+            log.error("微信支付失败");
+            throw throwable instanceof PayException
+                    ? (PayException) throwable
+                    : new PayException("微信支付失败", throwable);
+        }
+    }
+
+    /**
+     * 微信客户端外的移动端网页支付
+     * https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_4
+     *
+     * @param order
+     * @return java.lang.String
+     * @author Zhu Kaixiao
+     * @date 2020/8/15 14:23
+     */
+    @Override
+    public String payWapForm(IOrder order) {
+        try {
+            WxPayConfig wxPayConfig = getPayConfig();
+            Map<String, String> map = unifiedOrder(order, wxPayConfig, "MWEB");
+
+            String mwebUrl = map.get("mweb_url");
+
+            if (wxPayConfig.getWapReturnUrlGenerator() != null) {
+                mwebUrl = mwebUrl + "&redirect_url=" + URLUtil.encode(wxPayConfig.getWapReturnUrlGenerator().apply(order));
+            }
+
+            log.debug("微信支付,mweb_url: {}", mwebUrl);
+            return mwebUrl;
+        } catch (Throwable throwable) {
+            log.error("微信WAP支付失败");
+            throw throwable instanceof PayException
+                    ? (PayException) throwable
+                    : new PayException("微信WAP支付失败", throwable);
         }
     }
 
