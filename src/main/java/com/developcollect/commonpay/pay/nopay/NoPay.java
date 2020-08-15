@@ -13,7 +13,7 @@ import com.developcollect.commonpay.pay.*;
 public class NoPay extends AbstractPay {
 
     @Override
-    public String payForm(IOrder order) {
+    public String payPcForm(IOrder order) {
         throw new PayException("支付方式不存在");
     }
 

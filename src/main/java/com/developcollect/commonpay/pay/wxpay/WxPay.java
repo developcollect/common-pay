@@ -98,11 +98,6 @@ public class WxPay extends AbstractPay {
         return reqData;
     }
 
-    @Override
-    public String payForm(IOrder order) {
-        throw new PayException("微信支付不支持跳转到form表单支付");
-    }
-
     /**
      * 微信扫码支付
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_1

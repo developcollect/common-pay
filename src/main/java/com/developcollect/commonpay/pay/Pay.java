@@ -21,14 +21,24 @@ public interface Pay {
 
 
     /**
-     * 通过跳转到第三方的支付表单实现支付
+     * 通过跳转到第三方的支付PC表单实现支付
      *
      * @param order 支付订单
      * @return String html代码片段
      * @author zak
      * @since 1.0.0
      */
-    String payForm(IOrder order);
+    String payPcForm(IOrder order);
+
+    /**
+     * 通过跳转到第三方的支付WAP表单实现支付
+     *
+     * @param order
+     * @return java.lang.String
+     * @author Zhu Kaixiao
+     * @date 2020/8/15 10:55
+     */
+    String payWapForm(IOrder order);
 
     /**
      * 同步调用支付

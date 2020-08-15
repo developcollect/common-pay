@@ -24,8 +24,13 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
-    public String payForm(IOrder order) {
+    public String payPcForm(IOrder order) {
         throw new PayException("暂不支持跳转表单支付");
+    }
+
+    @Override
+    public String payWapForm(IOrder order) {
+        throw new PayException("暂不支持跳转WAP表单支付");
     }
 
     @Override

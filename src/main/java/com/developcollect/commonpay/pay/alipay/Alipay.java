@@ -126,6 +126,53 @@ public class Alipay extends AbstractPay {
         }
     }
 
+
+    /**
+     * 支付宝跳转wap页面支付
+     * <p>
+     * https://opendocs.alipay.com/open/203/107090
+     *
+     * @param order
+     * @return java.lang.String
+     */
+    @Override
+    public String payWapForm(IOrder order) {
+        try {
+            AliPayConfig aliPayConfig = getPayConfig();
+            AlipayClient alipayClient = getAlipayClient(aliPayConfig);
+
+            // 创建API对应的request
+            AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();
+            String notifyUrl = aliPayConfig.getPayNotifyUrlGenerator().apply(order);
+            alipayRequest.setNotifyUrl(notifyUrl);
+
+            // 在公共参数中设置回跳和通知地址
+            if (aliPayConfig.getWapReturnUrlGenerator() != null) {
+                alipayRequest.setReturnUrl(aliPayConfig.getWapReturnUrlGenerator().apply(order));
+            }
+
+            PayData payData = PayData.of(order);
+            payData.setProductCode("QUICK_WAP_PAY");
+
+            try {
+                String param = JSONObject.toJSONString(payData);
+                log.debug("支付宝支付参数: {}", param);
+                alipayRequest.setBizContent(param);
+                //调用SDK生成表单
+                String form = alipayClient.pageExecute(alipayRequest).getBody();
+                return form;
+            } catch (AlipayApiException e) {
+                log.error("支付宝支付时生成WAP表单失败", e);
+                throw new PayException("调起支付失败", e);
+            }
+        } catch (Throwable throwable) {
+            log.error("支付宝WAP支付失败", throwable);
+            throw (throwable instanceof PayException)
+                    ? (PayException) throwable
+                    : new PayException("支付宝WAP支付失败", throwable);
+        }
+    }
+
     /**
      * 支付宝统一收单下单并支付页面
      * https://opendocs.alipay.com/apis/api_1/alipay.trade.page.pay
@@ -134,7 +181,7 @@ public class Alipay extends AbstractPay {
      * @return java.lang.String
      */
     @Override
-    public String payForm(IOrder order) {
+    public String payPcForm(IOrder order) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
@@ -145,8 +192,8 @@ public class Alipay extends AbstractPay {
             alipayRequest.setNotifyUrl(notifyUrl);
 
             // 在公共参数中设置回跳和通知地址
-            if (aliPayConfig.getReturnUrlGenerator() != null) {
-                alipayRequest.setReturnUrl(aliPayConfig.getReturnUrlGenerator().apply(order));
+            if (aliPayConfig.getPcReturnUrlGenerator() != null) {
+                alipayRequest.setReturnUrl(aliPayConfig.getPcReturnUrlGenerator().apply(order));
             }
 
             PayData payData = PayData.of(order);
@@ -155,15 +202,16 @@ public class Alipay extends AbstractPay {
             String param = JSONObject.toJSONString(payData);
             log.debug("支付宝支付参数: {}", param);
             alipayRequest.setBizContent(param);
-            String form;
+
             try {
                 //调用SDK生成表单
-                form = alipayClient.pageExecute(alipayRequest).getBody();
+                String form = alipayClient.pageExecute(alipayRequest).getBody();
+                return form;
             } catch (AlipayApiException e) {
                 log.error("支付宝支付时生成表单失败", e);
                 throw new PayException("调起支付失败", e);
             }
-            return form;
+
         } catch (Throwable throwable) {
             log.error("支付宝支付失败", throwable);
             throw (throwable instanceof PayException)

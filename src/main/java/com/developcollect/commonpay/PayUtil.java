@@ -69,7 +69,7 @@ public class PayUtil {
     }
 
     /**
-     * 支付(页面跳转方式)
+     * 支付(PC页面跳转方式)
      * 返回的是一段html代码
      *
      * @param order 订单
@@ -77,14 +77,15 @@ public class PayUtil {
      * @author zak
      * @since 1.0.0
      */
-    public static String payForm(IOrder order) {
+    public static String payPcForm(IOrder order) {
         Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
-        String form = pay.payForm(order);
+        String form = pay.payPcForm(order);
         return form;
     }
 
+
     /**
-     * 支付(页面跳转方式)
+     * 支付(PC页面跳转方式)
      * 返回的是一个页面链接
      *
      * @param order 订单
@@ -92,11 +93,46 @@ public class PayUtil {
      * @author zak
      * @since 1.0.0
      */
-    public static String payFormAccessUrl(IOrder order) {
-        String form = payForm(order);
+    public static String payPcFormAccessUrl(IOrder order) {
+        String form = payPcForm(order);
         String accessUrl = GlobalConfig
                 .getPayConfig(order.getPayPlatform())
-                .getPayFormHtmlAccessUrlGenerator()
+                .getPcPayFormHtmlAccessUrlGenerator()
+                .apply(order, form);
+        return accessUrl;
+    }
+
+
+    /**
+     * 支付(PC页面跳转方式)
+     * 返回的是一段html代码
+     *
+     * @param order 订单
+     * @return html代码段
+     * @author zak
+     * @since 1.0.0
+     */
+    public static String payWapForm(IOrder order) {
+        Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
+        String form = pay.payWapForm(order);
+        return form;
+    }
+
+
+    /**
+     * 支付(PC页面跳转方式)
+     * 返回的是一个页面链接
+     *
+     * @param order 订单
+     * @return 支付页面链接
+     * @author zak
+     * @since 1.0.0
+     */
+    public static String payWapFormAccessUrl(IOrder order) {
+        String form = payWapForm(order);
+        String accessUrl = GlobalConfig
+                .getPayConfig(order.getPayPlatform())
+                .getWapPayFormHtmlAccessUrlGenerator()
                 .apply(order, form);
         return accessUrl;
     }

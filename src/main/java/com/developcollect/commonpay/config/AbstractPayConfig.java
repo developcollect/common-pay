@@ -27,19 +27,15 @@ public abstract class AbstractPayConfig {
     private boolean debug = false;
 
     /**
-     * 退款时的回调地址生成器
+     * 退款结果异步通知地址生成器
      */
     protected BiFunction<IOrder, IRefund, String> refundNotifyUrlGenerator;
 
     /**
-     * 支付时的回调地址生成器
+     * 支付结果异步通知地址生成器
      */
     protected Function<IOrder, String> payNotifyUrlGenerator;
 
-    /**
-     * 支付完成跳转地址生成器
-     */
-    protected Function<IOrder, String> returnUrlGenerator;
 
     /**
      * 支付二维码访问链接生成器
@@ -47,9 +43,24 @@ public abstract class AbstractPayConfig {
     protected BiFunction<IOrder, String, String> payQrCodeAccessUrlGenerator;
 
     /**
-     * 支付页面访问链接生成器
+     * PC支付页面访问链接生成器
      */
-    protected BiFunction<IOrder, String, String> payFormHtmlAccessUrlGenerator;
+    protected BiFunction<IOrder, String, String> pcPayFormHtmlAccessUrlGenerator;
+
+    /**
+     * PC支付完成跳转地址生成器
+     */
+    protected Function<IOrder, String> pcReturnUrlGenerator;
+
+    /**
+     * WAP支付页面访问链接生成器
+     */
+    protected BiFunction<IOrder, String, String> wapPayFormHtmlAccessUrlGenerator;
+
+    /**
+     * WAP支付完成跳转地址生成器
+     */
+    protected Function<IOrder, String> wapReturnUrlGenerator;
 
 
     /**

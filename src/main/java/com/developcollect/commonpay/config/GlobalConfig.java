@@ -99,7 +99,7 @@ public class GlobalConfig {
 
     /**
      * 根据支付平台获取相应的支付配置
-     * @param payPlatform 支付平台 取值见{@link com.zakwz.commonpay.PayPlatform}
+     * @param payPlatform 支付平台 取值见{@link com.developcollect.commonpay.PayPlatform}
      * @param <T> 支付配置的类型
      * @return 支付配置
      * @author zak
