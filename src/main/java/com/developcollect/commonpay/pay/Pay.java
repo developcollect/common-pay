@@ -50,7 +50,7 @@ public interface Pay {
      * @author Zhu Kaixiao
      * @date 2020/8/15 13:49
      */
-    WxJsPayResult wxJsPay(IOrder order);
+    PayWxJsResult payWxJs(IOrder order);
 
     /**
      * 同步调用支付

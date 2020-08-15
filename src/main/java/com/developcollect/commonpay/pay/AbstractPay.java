@@ -34,7 +34,7 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
-    public WxJsPayResult wxJsPay(IOrder order) {
+    public PayWxJsResult payWxJs(IOrder order) {
         throw new PayException("暂不支持微信JS支付");
     }
 

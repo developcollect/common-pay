@@ -15,7 +15,7 @@ import java.util.Map;
  * 仅限于授权后使用，禁止非授权传阅以及私自用于商业目的。
  */
 @Data
-public class WxJsPayResult {
+public class PayWxJsResult {
 
     /**
      * 公众号id
@@ -54,8 +54,8 @@ public class WxJsPayResult {
     private String paySign;
 
 
-    public static WxJsPayResult of(Map<String, String> wxJsPayMap) {
-        WxJsPayResult wxJsPayResult = new WxJsPayResult();
+    public static PayWxJsResult of(Map<String, String> wxJsPayMap) {
+        PayWxJsResult wxJsPayResult = new PayWxJsResult();
         wxJsPayResult.setAppId(wxJsPayMap.get("appid"));
         wxJsPayResult.setTimeStamp(wxJsPayMap.get("timeStamp"));
         wxJsPayResult.setNonceStr(wxJsPayMap.get("nonce_str"));

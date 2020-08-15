@@ -123,6 +123,20 @@ public class PayUtil {
         return form;
     }
 
+    /**
+     * 在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
+     * 仅微信支持
+     *
+     * @param order 订单
+     * @return WxJsPayResult
+     * @author Zhu Kaixiao
+     * @date 2020/8/15 13:49
+     */
+    public PayWxJsResult payWxJs(IOrder order) {
+        Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
+        PayWxJsResult payWxJsResult = pay.payWxJs(order);
+        return payWxJsResult;
+    }
 
     /**
      * 支付(PC页面跳转方式)

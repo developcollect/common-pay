@@ -165,7 +165,7 @@ public class WxPay extends AbstractPay {
      * @return com.developcollect.commonpay.pay.WxJsPayResult
      */
     @Override
-    public WxJsPayResult wxJsPay(IOrder order) {
+    public PayWxJsResult payWxJs(IOrder order) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
             Map<String, String> map = unifiedOrder(order, wxPayConfig, "JSAPI");
@@ -181,8 +181,8 @@ public class WxPay extends AbstractPay {
                     wxPayConfig.isDebug() ? WXPayConstants.SignType.MD5 : WXPayConstants.SignType.HMACSHA256));
             wxJsPayMap.put("prepay_id", prepayId);
 
-            WxJsPayResult wxJsPayResult = WxJsPayResult.of(wxJsPayMap);
-            return wxJsPayResult;
+            PayWxJsResult payWxJsResult = PayWxJsResult.of(wxJsPayMap);
+            return payWxJsResult;
         } catch (Throwable throwable) {
             log.error("微信支付失败");
             throw throwable instanceof PayException
