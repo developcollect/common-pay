@@ -132,7 +132,7 @@ public class PayUtil {
      * @author Zhu Kaixiao
      * @date 2020/8/15 13:49
      */
-    public PayWxJsResult payWxJs(IOrder order) {
+    public static PayWxJsResult payWxJs(IOrder order) {
         Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
         PayWxJsResult payWxJsResult = pay.payWxJs(order);
         return payWxJsResult;

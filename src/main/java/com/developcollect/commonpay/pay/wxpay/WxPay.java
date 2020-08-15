@@ -171,7 +171,7 @@ public class WxPay extends AbstractPay {
             Map<String, String> map = unifiedOrder(order, wxPayConfig, "JSAPI");
             String prepayId = map.get("prepay_id");
 
-            Map<String, String> wxJsPayMap = new HashMap<>();
+            Map<String, String> wxJsPayMap = new HashMap<>(8);
             wxJsPayMap.put("package", "prepay_id=" + prepayId);
             wxJsPayMap.put("appid", wxPayConfig.getAppId());
             wxJsPayMap.put("nonce_str", WXPayUtil.generateNonceStr());
