@@ -147,12 +147,14 @@ public class PayUtil {
      * @since 1.0.0
      */
     public static String payWapFormAccessUrl(IOrder order) {
-        String form = payWapForm(order);
         if (order.getPayPlatform() == PayPlatform.WX_PAY) {
             // 微信是直接返回的url, 不需要通过访问链接生成器生成
+            Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
+            String form = pay.payWapForm(order);
             return form;
         }
 
+        String form = payWapForm(order);
         String accessUrl = GlobalConfig
                 .getPayConfig(order.getPayPlatform())
                 .getWapPayFormHtmlAccessUrlGenerator()
