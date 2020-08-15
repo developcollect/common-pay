@@ -1,6 +1,6 @@
 # common-pay
 
-#### 简介
+### 简介
 
 ​        common-pay是一个封装了常见平台支付方法调用的工具（其实目前只支持支付宝支付和微信支付），其中包括跳转网页支付、扫描二维码支付、订单退款和转账方法。为各平台提供了统一的调用方法，以及一致的方法返回值，它节省了开发人员对支付接口的对接时间，使开发专注于业务。
 
@@ -9,15 +9,23 @@
 | 支付宝 |       ✓        |        ✓         |         ✓          |         ✓          |         ✓          |          ✓          |          ✓          |     ✗      |         |  ✓   |  ✓   |
 |  微信  |       ✓        |        ✓         |         ✓          |         ✗          |         ✗          |          ✗          |          ✓          |     ✓      |         |  ✓   |  ✓   |
 
-> ​      ✓：支持     ✗： 不支持     空白：暂未加入
+> ​      ✓：支持               ✗： 不支持               空白：暂未加入
 
-#### 怕写在后面没人开
+
+
+
+
+### 怕写在后面没人看
 
 **spring boot项目使用[common-pay-spring-boot-starter](https://github.com/developcollect/common-pay-spring-boot-starter)更香哦~**
 
 **具体使用案例可参考[common-pay-sample](https://github.com/developcollect/common-pay-sample)**
 
-#### 安装
+
+
+
+
+### 安装
 
 ##### Maven
 
@@ -44,7 +52,11 @@ implementation 'com.developcollect:common-pay:1.8.5'
 
 > 注意：common-pay仅支持JDK8+
 
-#### 目录结构描述
+
+
+
+
+### 目录结构描述
 
 ```txt
 commonpay
@@ -124,7 +136,11 @@ commonpay
     UnitUtil.java                                           // 单位换算工具
 ```
 
-#### 使用
+
+
+
+
+### 使用
 
 1. 创建GlobalConfig对象并配置支付所需的各项参数*(支付平台支付参数、返回地址生成器、跳转地址生成器、支付结果广播器等等......)*，具体参数因支付平台不同而不同，最终将各参数赋值到GlobalConfig中的相应字段
 2. 通过反射调用**GlobalConfig#init()**方法， 触发配置的初始化（之所以将init()设置为私有方法，是为了防止其他地方误调用）
@@ -133,16 +149,28 @@ commonpay
 5. 调用**PayUtil**中的相应方法
 6. 这一步是来凑个六六大顺的，这时你已经可以拿起手机来支付了
 
-#### 提供bug反馈或建议
+
+
+
+
+### 提供bug反馈或建议
 
 提交问题反馈请说明正在使用的JDK版本呢、common-pay版本和相关依赖库版本。
 
 * [Github issue](https://github.com/developcollect/common-pay-sample/issues)
 
-#### 添砖加瓦
+
+
+
+
+### 添砖加瓦
 
 emmm... 分支啥的都还没弄好，等弄好了我再来补~ 咕咕咕~~
 
-#### 写在最后
+
+
+
+
+### 写在最后
 
 common-pay是我的第一个开源项目，花了我一个周末和好几个夜晚，为此连女朋友都冷落了~ 各位觉得好用麻烦点个star，并推荐给小伙伴；要是觉得不好用欢迎来提issue，并顺手推给你讨厌的朋友吧😂
