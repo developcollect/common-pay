@@ -3,6 +3,7 @@ package com.developcollect.commonpay.pay;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Map;
  * 仅限于授权后使用，禁止非授权传阅以及私自用于商业目的。
  */
 @Data
-public class PayWxJsResult {
+public class PayWxJsResult implements Serializable {
 
     /**
      * 公众号id
