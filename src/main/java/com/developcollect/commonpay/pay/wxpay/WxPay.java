@@ -38,7 +38,7 @@ public class WxPay extends AbstractPay {
         return wxPay;
     }
 
-    private Map<String, String> convertToPayReqMap(IOrder order, String tradeType) {
+    private Map<String, String> convertToPayReqMap(IOrder order) {
         Map<String, String> reqData = new HashMap<>(16);
         reqData.put("body", "商品_" + order.getOutTradeNo());
         reqData.put("out_trade_no", order.getOutTradeNo());
@@ -46,7 +46,6 @@ public class WxPay extends AbstractPay {
         reqData.put("total_fee", String.valueOf(order.getTotalFee()));
         // 这个ip好像可以随便填
         reqData.put("spbill_create_ip", "117.43.68.32");
-        reqData.put("trade_type", tradeType);
         if (order.getTimeStart() != null) {
             reqData.put("time_start", DateUtil.format(order.getTimeStart(), "yyyyMMddHHmmss"));
         }
@@ -112,10 +111,14 @@ public class WxPay extends AbstractPay {
      * @author Zhu Kaixiao
      * @date 2020/8/15 14:18
      */
-    private Map<String, String> unifiedOrder(IOrder order, WxPayConfig wxPayConfig, String tradeType) throws Exception {
-
+    private Map<String, String> unifiedOrder(IOrder order, WxPayConfig wxPayConfig, String tradeType, String openId) throws Exception {
         WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
-        Map<String, String> reqData = convertToPayReqMap(order, tradeType);
+        Map<String, String> reqData = convertToPayReqMap(order);
+        reqData.put("trade_type", tradeType);
+        if (StrUtil.isNotBlank(openId)) {
+            // trade_type=JSAPI时（即JSAPI支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识。
+            reqData.put("openid", openId);
+        }
         reqData.put("notify_url", wxPayConfig.getPayNotifyUrlGenerator().apply(order));
 
         if (log.isDebugEnabled()) {
@@ -144,7 +147,7 @@ public class WxPay extends AbstractPay {
     public String payQrCode(IOrder order) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(order, wxPayConfig, "NATIVE");
+            Map<String, String> map = unifiedOrder(order, wxPayConfig, "NATIVE", null);
 
             String codeUrl = map.get("code_url");
             log.debug("微信支付,code_url: {}", codeUrl);
@@ -165,10 +168,10 @@ public class WxPay extends AbstractPay {
      * @return com.developcollect.commonpay.pay.WxJsPayResult
      */
     @Override
-    public PayWxJsResult payWxJs(IOrder order) {
+    public PayWxJsResult payWxJs(IOrder order, String openId) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(order, wxPayConfig, "JSAPI");
+            Map<String, String> map = unifiedOrder(order, wxPayConfig, "JSAPI", openId);
             String prepayId = map.get("prepay_id");
 
             Map<String, String> wxJsPayMap = new HashMap<>(8);
@@ -204,7 +207,7 @@ public class WxPay extends AbstractPay {
     public String payWapForm(IOrder order) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(order, wxPayConfig, "MWEB");
+            Map<String, String> map = unifiedOrder(order, wxPayConfig, "MWEB", null);
 
             String mwebUrl = map.get("mweb_url");
 

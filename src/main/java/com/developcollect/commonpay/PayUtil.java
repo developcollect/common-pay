@@ -128,13 +128,12 @@ public class PayUtil {
      * 仅微信支持
      *
      * @param order 订单
+     * @param openId 微信用户标识
      * @return WxJsPayResult
-     * @author Zhu Kaixiao
-     * @date 2020/8/15 13:49
      */
-    public static PayWxJsResult payWxJs(IOrder order) {
+    public static PayWxJsResult payWxJs(IOrder order, String openId) {
         Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
-        PayWxJsResult payWxJsResult = pay.payWxJs(order);
+        PayWxJsResult payWxJsResult = pay.payWxJs(order, openId);
         return payWxJsResult;
     }
 

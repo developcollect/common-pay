@@ -45,12 +45,13 @@ public interface Pay {
      * 在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
      * 仅微信支持
      *
-     * @param order
-     * @return void
+     * @param order 订单
+     * @param openId 微信用户在商户对应appid下的唯一标识。
+     * @return PayWxJsResult
      * @author Zhu Kaixiao
      * @date 2020/8/15 13:49
      */
-    PayWxJsResult payWxJs(IOrder order);
+    PayWxJsResult payWxJs(IOrder order, String openId);
 
     /**
      * 同步调用支付
