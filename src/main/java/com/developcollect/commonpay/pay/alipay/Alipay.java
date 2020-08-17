@@ -7,10 +7,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.*;
-import com.alipay.api.response.AlipayFundTransUniTransferResponse;
-import com.alipay.api.response.AlipayTradePrecreateResponse;
-import com.alipay.api.response.AlipayTradeQueryResponse;
-import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.alipay.api.response.*;
 import com.developcollect.commonpay.PayPlatform;
 import com.developcollect.commonpay.config.AliPayConfig;
 import com.developcollect.commonpay.exception.PayException;
@@ -83,6 +80,40 @@ public class Alipay extends AbstractPay {
 //     * alipayClient是可重用的
 //     */
 //    private volatile AlipayClient alipayClient;
+
+
+    /**
+     * https://opendocs.alipay.com/open/194/106039
+     */
+    @Override
+    public PayResponse payScan(IOrder order, String authCode) {
+        try {
+            AliPayConfig aliPayConfig = getPayConfig();
+            AlipayClient alipayClient = getAlipayClient(aliPayConfig);
+
+            AlipayTradePayRequest alipayTradePayRequest = new AlipayTradePayRequest();
+            alipayTradePayRequest.setNotifyUrl(aliPayConfig.getPayNotifyUrlGenerator().apply(order));
+
+
+            PayData payData = PayData.of(order);
+            payData.setAuthCode(authCode);
+            payData.setProductCode("FACE_TO_FACE_PAYMENT");
+
+            String param = JSONObject.toJSONString(payData);
+            log.debug("支付宝支付参数: {}", param);
+            alipayTradePayRequest.setBizContent(param);
+            AlipayTradePayResponse response = alipayClient.execute(alipayTradePayRequest);
+
+            // 当前预下单请求生成的二维码码串，可以用二维码生成工具根据该码串值生成对应的二维码
+            PayResponse payResponse = PayResponse.of(response);
+            return payResponse;
+        } catch (Throwable throwable) {
+            log.error("支付宝支付失败", throwable);
+            throw (throwable instanceof PayException)
+                    ? (PayException) throwable
+                    : new PayException("支付宝支付失败", throwable);
+        }
+    }
 
     /**
      * 支付宝预下单扫码支付

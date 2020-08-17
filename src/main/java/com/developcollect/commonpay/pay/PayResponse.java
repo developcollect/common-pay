@@ -1,6 +1,7 @@
 package com.developcollect.commonpay.pay;
 
 import cn.hutool.core.date.DateUtil;
+import com.alipay.api.response.AlipayTradePayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.developcollect.commonpay.PayPlatform;
 import com.developcollect.commonpay.pay.alipay.bean.AliPayDTO;
@@ -107,6 +108,21 @@ public class PayResponse implements Serializable {
                 .setTradeNo(alipayTradeQueryResponse.getTradeNo())
                 .setPayTime(DateUtil.toLocalDateTime(alipayTradeQueryResponse.getSendPayDate()))
                 .setOutTradeNo(alipayTradeQueryResponse.getOutTradeNo());
+
+        return payResponse;
+    }
+
+    public static PayResponse of(AlipayTradePayResponse response) {
+        PayResponse payResponse = new PayResponse();
+        payResponse
+                .setSuccess(response.isSuccess())
+                .setErrCode(response.getCode())
+                .setErrCodeDes(response.getMsg())
+                .setRawObj(response)
+                .setPayPlatform(PayPlatform.ALI_PAY)
+                .setTradeNo(response.getTradeNo())
+                .setPayTime(DateUtil.toLocalDateTime(response.getGmtPayment()))
+                .setOutTradeNo(response.getOutTradeNo());
 
         return payResponse;
     }

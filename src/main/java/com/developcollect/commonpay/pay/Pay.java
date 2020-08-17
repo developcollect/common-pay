@@ -10,6 +10,14 @@ public interface Pay {
 
 
     /**
+     * 扫用户付款码支付
+     *
+     * @param order    订单
+     * @param authCode 付款码
+     */
+    PayResponse payScan(IOrder order, String authCode);
+
+    /**
      * app支付
      * 有些平台(如: 微信)在app支付时需要后台预下单,然后app根据预下单结果进行支付
      * 有的(如: 支付宝)不需要,只要app直接调用平台支付接口就行

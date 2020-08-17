@@ -136,6 +136,38 @@ public class WxPay extends AbstractPay {
         return map;
     }
 
+    @Override
+    public PayResponse payScan(IOrder order, String authCode) {
+        try {
+            WxPayConfig wxPayConfig = getPayConfig();
+            WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
+            Map<String, String> reqData = convertToPayReqMap(order);
+            reqData.put("auth_code", authCode);
+            Map<String, String> map = wxSdkPay.microPay(reqData);
+            if ("FAIL".equals(map.get("return_code"))) {
+                throw new PayException(map.get("return_msg"));
+            }
+
+
+            PayResponse payResponse = new PayResponse();
+            payResponse.setPayPlatform(PayPlatform.WX_PAY);
+            payResponse.setSuccess("SUCCESS".equals(map.get("result_code")));
+            payResponse.setErrCode(map.get("err_code"));
+            payResponse.setErrCodeDes(map.get("err_code_des"));
+            payResponse.setTradeNo(map.get("transaction_id"));
+            payResponse.setOutTradeNo(map.get("out_trade_no"));
+            payResponse.setPayTime(DateUtil.parseLocalDateTime(map.get("time_end"), "yyyyMMddHHmmss"));
+            payResponse.setRawObj((Serializable) map);
+
+            return payResponse;
+        } catch (Throwable throwable) {
+            log.error("微信APP支付失败");
+            throw throwable instanceof PayException
+                    ? (PayException) throwable
+                    : new PayException("微信APP支付失败", throwable);
+        }
+    }
+
     /**
      * app支付
      * <p>

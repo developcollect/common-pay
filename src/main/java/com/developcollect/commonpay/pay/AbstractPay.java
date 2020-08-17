@@ -19,6 +19,11 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
+    public PayResponse payScan(IOrder order, String authCode) {
+        throw new PayException("暂不支持扫用户付款码支付");
+    }
+
+    @Override
     public PayAppResult payApp(IOrder order) {
         throw new PayException("暂不支持App支付");
     }

@@ -17,8 +17,40 @@ import lombok.extern.slf4j.Slf4j;
 public class PayUtil {
 
     /**
+     * 扫用户付款码支付
+     * <p>
+     * 官方文档:
+     * 支付宝  https://opendocs.alipay.com/open/194/105072
+     * 微信    https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
+     *
+     * @param order    订单
+     * @param authCode 付款码
+     */
+    public static PayResponse payScan(IOrder order, String authCode) {
+        Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
+        PayResponse payResponse = pay.payScan(order, authCode);
+        return payResponse;
+    }
+
+    /**
+     * 使用订单中的支付平台, 而是用指定的支付平台进行扫用户付款码支付
+     *
+     * @param payPlatform 支付平台
+     * @param order       订单
+     * @param authCode    付款码
+     */
+    public static PayResponse payScan(int payPlatform, IOrder order, String authCode) {
+        RePayPlatformOrder rePayPlatformOrder = new RePayPlatformOrder(payPlatform, order);
+        PayResponse payResponse = payScan(rePayPlatformOrder, authCode);
+        return payResponse;
+    }
+
+    /**
      * app支付
      *
+     * 官方文档:
+     * 支付宝  https://opendocs.alipay.com/open/204/105051
+     * 微信    https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_1
      * @param order 订单
      * @return com.developcollect.commonpay.pay.PayAppResult
      */
@@ -45,6 +77,9 @@ public class PayUtil {
      * 支付(二维码)
      * 返回的是二维码的文本值, 可根据该文本值生成二维码图片
      *
+     * 官方文档:
+     * 支付宝  https://opendocs.alipay.com/open/194/106078
+     * 微信    https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=6_1
      * @param order 订单
      * @return java.lang.String 二维码值
      * @author zak
@@ -143,6 +178,9 @@ public class PayUtil {
      * 支付(PC页面跳转方式)
      * 返回的是一段html代码
      *
+     * 官方文档:
+     * 支付宝  https://opensupport.alipay.com/support/helpcenter/95/201602482184?ant_source=zsearch
+     * 微信    不支持
      * @param order 订单
      * @return html代码段
      * @author zak
@@ -207,6 +245,9 @@ public class PayUtil {
      * 支付(WAP页面跳转方式)
      * 返回的是一段html代码
      *
+     * 官方文档:
+     * 支付宝  https://opendocs.alipay.com/apis/api_1/alipay.trade.wap.pay
+     * 微信    https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_1
      * @param order 订单
      * @return html代码段
      * @author zak
@@ -237,35 +278,6 @@ public class PayUtil {
         return payWapForm(rePayPlatformOrder);
     }
 
-    /**
-     * 在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
-     * 仅微信支持
-     *
-     * @param order 订单
-     * @param openId 微信用户标识
-     * @return WxJsPayResult
-     */
-    public static PayWxJsResult payWxJs(IOrder order, String openId) {
-        Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
-        PayWxJsResult payWxJsResult = pay.payWxJs(order, openId);
-        return payWxJsResult;
-    }
-
-    /**
-     * 不使用订单中的支付平台, 而是用指定的支付平台在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
-     * 仅微信支持
-     *
-     * @param payPlatform 支付平台
-     * @param order       订单
-     * @param openId      微信用户标识
-     * @return WxJsPayResult
-     * @author zak
-     * @since 1.8.6
-     */
-    public static PayWxJsResult payWxJs(int payPlatform, IOrder order, String openId) {
-        RePayPlatformOrder rePayPlatformOrder = new RePayPlatformOrder(payPlatform, order);
-        return payWxJs(rePayPlatformOrder, openId);
-    }
 
     /**
      * 支付(WAP页面跳转方式)
@@ -305,6 +317,40 @@ public class PayUtil {
     public static String payWapFormAccessUrl(int payPlatform, IOrder order) {
         RePayPlatformOrder rePayPlatformOrder = new RePayPlatformOrder(payPlatform, order);
         return payWapFormAccessUrl(rePayPlatformOrder);
+    }
+
+    /**
+     * 在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
+     * 仅微信支持
+     * <p>
+     * 官方文档:
+     * 支付宝  不支持
+     * 微信    https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_1
+     *
+     * @param order  订单
+     * @param openId 微信用户标识
+     * @return WxJsPayResult
+     */
+    public static PayWxJsResult payWxJs(IOrder order, String openId) {
+        Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
+        PayWxJsResult payWxJsResult = pay.payWxJs(order, openId);
+        return payWxJsResult;
+    }
+
+    /**
+     * 不使用订单中的支付平台, 而是用指定的支付平台在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
+     * 仅微信支持
+     *
+     * @param payPlatform 支付平台
+     * @param order       订单
+     * @param openId      微信用户标识
+     * @return WxJsPayResult
+     * @author zak
+     * @since 1.8.6
+     */
+    public static PayWxJsResult payWxJs(int payPlatform, IOrder order, String openId) {
+        RePayPlatformOrder rePayPlatformOrder = new RePayPlatformOrder(payPlatform, order);
+        return payWxJs(rePayPlatformOrder, openId);
     }
 
     /**
@@ -377,6 +423,9 @@ public class PayUtil {
      * 退款(同步方法)
      * 直接返回退款结果,而不是通过异步通知的形式
      *
+     * 官方文档:
+     * 支付宝  https://opendocs.alipay.com/apis/api_1/alipay.trade.refund
+     * 微信    https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
      * @param order 订单对象
      * @param refund 退款对象
      * @return RefundResponse 退款结果
@@ -418,6 +467,9 @@ public class PayUtil {
      * 转账(同步方法)
      * 直接返回转账结果,而不是通过异步通知的形式
      *
+     * 官方文档:
+     * 支付宝  https://opendocs.alipay.com/open/309/106235
+     * 微信    https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_1
      * @param transfer 转账对象
      * @return TransferResponse 转账结果
      * @author zak

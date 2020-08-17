@@ -59,6 +59,9 @@ public class PayData implements Serializable {
     @JSONField(name = "passback_params")
     private String passbackParams;
 
+    @JSONField(name = "auth_code")
+    private String authCode;
+
 
     public String getTotal_amount() {
         return String.valueOf(totalAmount / 100.0);
