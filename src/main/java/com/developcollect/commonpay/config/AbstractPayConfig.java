@@ -5,6 +5,7 @@ import com.developcollect.commonpay.pay.IRefund;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -67,7 +68,7 @@ public abstract class AbstractPayConfig {
      * 扩展Map
      * 方便其他自定义配置放到这里
      */
-    protected Map<String, ?> extendMap;
+    protected Map<String, Object> extendMap = new HashMap<>();
 
     /**
      * 二维码宽度
@@ -79,4 +80,25 @@ public abstract class AbstractPayConfig {
      */
     protected int qrCodeHeight = 300;
 
+    /**
+     * 获取自定义配置
+     *
+     * @param key key
+     * @return java.lang.Object
+     */
+    public <T> T getExtend(String key) {
+        return (T) extendMap.get(key);
+    }
+
+    /**
+     * 设置自定义配置
+     *
+     * @param key    key
+     * @param extend 自定义配置值
+     * @return java.lang.Object
+     */
+    public Object putExtend(String key, Object extend) {
+        extendMap.put(key, extend);
+        return this;
+    }
 }
