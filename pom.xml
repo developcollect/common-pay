@@ -9,7 +9,7 @@
     <version>1.8.6</version>
 
     <name>common-pay</name>
-    <url>http://www.example.com</url>
+    <url>https://github.com/developcollect/common-pay</url>
     <description>
         这是一个支付通用组件
     </description>
