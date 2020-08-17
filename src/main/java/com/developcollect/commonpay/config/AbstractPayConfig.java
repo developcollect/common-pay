@@ -5,6 +5,7 @@ import com.developcollect.commonpay.pay.IRefund;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -62,15 +63,20 @@ public abstract class AbstractPayConfig {
      */
     protected Function<IOrder, String> wapReturnUrlGenerator;
 
+    /**
+     * 扩展Map
+     * 方便其他自定义配置放到这里
+     */
+    protected Map<String, ?> extendMap;
 
     /**
      * 二维码宽度
      */
-    private int qrCodeWidth = 300;
+    protected int qrCodeWidth = 300;
 
     /**
      * 二维码高度
      */
-    private int qrCodeHeight = 300;
+    protected int qrCodeHeight = 300;
 
 }
