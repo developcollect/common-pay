@@ -137,6 +137,52 @@ public class WxPay extends AbstractPay {
     }
 
     /**
+     * app支付
+     * <p>
+     * https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_3
+     *
+     * @param order
+     */
+    @Override
+    public PayAppResult payApp(IOrder order) {
+
+        try {
+            WxPayConfig wxPayConfig = getPayConfig();
+            Map<String, String> map = unifiedOrder(order, wxPayConfig, "APP", null);
+
+            String prepayId = map.get("prepay_id");
+
+            Map<String, String> signParam = new HashMap<>(8);
+            signParam.put("package", "Sign=WXPay");
+            signParam.put("partnerid", wxPayConfig.getMchId());
+            signParam.put("appid", wxPayConfig.getAppId());
+            signParam.put("nonce_str", WXPayUtil.generateNonceStr());
+            signParam.put("timeStamp", String.valueOf((System.currentTimeMillis() / 1000)));
+            signParam.put("sign_type", wxPayConfig.isDebug() ? WXPayConstants.MD5 : WXPayConstants.HMACSHA256);
+            signParam.put("sign", WXPayUtil.generateSignature(signParam, wxPayConfig.getKey(),
+                    wxPayConfig.isDebug() ? WXPayConstants.SignType.MD5 : WXPayConstants.SignType.HMACSHA256));
+            signParam.put("prepay_id", prepayId);
+
+            PayAppResult payAppResult = new PayAppResult();
+            payAppResult.setAppId(signParam.get("appid"));
+            payAppResult.setPartnerId(signParam.get("partnerid"));
+            payAppResult.setTimeStamp(signParam.get("timeStamp"));
+            payAppResult.setNonceStr(signParam.get("nonce_str"));
+            payAppResult.setPackage0(signParam.get("package"));
+            payAppResult.setPrepayId(signParam.get("prepay_id"));
+            payAppResult.setSignType(signParam.get("sign_type"));
+            payAppResult.setPaySign(signParam.get("sign"));
+
+            return payAppResult;
+        } catch (Throwable throwable) {
+            log.error("微信APP支付失败");
+            throw throwable instanceof PayException
+                    ? (PayException) throwable
+                    : new PayException("微信APP支付失败", throwable);
+        }
+    }
+
+    /**
      * 微信扫码支付
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_1
      *

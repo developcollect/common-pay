@@ -17,6 +17,31 @@ import lombok.extern.slf4j.Slf4j;
 public class PayUtil {
 
     /**
+     * app支付
+     *
+     * @param order 订单
+     * @return com.developcollect.commonpay.pay.PayAppResult
+     */
+    public static PayAppResult payApp(IOrder order) {
+        Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
+        PayAppResult result = pay.payApp(order);
+        return result;
+    }
+
+    /**
+     * 不使用订单中的支付平台, 而是用指定的支付平台进行app支付
+     *
+     * @param payPlatform 支付平台
+     * @param order       订单
+     * @return com.developcollect.commonpay.pay.PayAppResult
+     */
+    public static PayAppResult payApp(int payPlatform, IOrder order) {
+        RePayPlatformOrder rePayPlatformOrder = new RePayPlatformOrder(payPlatform, order);
+        PayAppResult result = payApp(rePayPlatformOrder);
+        return result;
+    }
+
+    /**
      * 支付(二维码)
      * 返回的是二维码的文本值, 可根据该文本值生成二维码图片
      *

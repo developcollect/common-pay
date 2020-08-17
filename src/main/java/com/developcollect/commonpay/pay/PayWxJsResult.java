@@ -19,7 +19,7 @@ import java.util.Map;
 public class PayWxJsResult implements Serializable {
 
     /**
-     * 公众号id
+     * appid
      */
     private String appId;
 
