@@ -33,22 +33,22 @@ common-pay是一个封装了常见平台支付方法调用的工具（其实目�
 <dependency>
   <groupId>com.developcollect</groupId>
   <artifactId>common-pay</artifactId>
-  <version>1.8.5</version>
+  <version>1.8.8</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```groovy
-implementation 'com.developcollect:common-pay:1.8.5'
+implementation 'com.developcollect:common-pay:1.8.8'
 ```
 
 ##### 非Maven项目
 
 点击以下任一链接，下载`common-pay-X.X.X.jar`即可：
 
-* [Maven中央仓库1](https://repo1.maven.org/maven2/com/developcollect/common-pay/1.8.5/)
-* [Maven中央仓库2](https://repo2.maven.org/maven2/com/developcollect/common-pay/1.8.5/)
+* [Maven中央仓库1](https://repo1.maven.org/maven2/com/developcollect/common-pay/1.8.8/)
+* [Maven中央仓库2](https://repo2.maven.org/maven2/com/developcollect/common-pay/1.8.8/)
 
 > 注意：common-pay仅支持JDK8+
 
