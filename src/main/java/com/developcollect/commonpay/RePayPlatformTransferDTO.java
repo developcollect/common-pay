@@ -1,6 +1,6 @@
 package com.developcollect.commonpay;
 
-import com.developcollect.commonpay.pay.ITransfer;
+import com.developcollect.commonpay.pay.ITransferDTO;
 import lombok.RequiredArgsConstructor;
 
 
@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
  * @since 1.8.6
  */
 @RequiredArgsConstructor
-public class RePayPlatformTransfer implements ITransfer {
+public class RePayPlatformTransferDTO implements ITransferDTO {
 
     private final int payPlatform;
-    private final ITransfer transfer;
+    private final ITransferDTO transfer;
 
 
     @Override
@@ -55,5 +55,15 @@ public class RePayPlatformTransfer implements ITransfer {
     @Override
     public int getPayPlatform() {
         return payPlatform;
+    }
+
+    @Override
+    public Object getExt(String key) {
+        return transfer.getExt(key);
+    }
+
+    @Override
+    public void putExt(String key, Object extParameter) {
+        transfer.putExt(key, extParameter);
     }
 }

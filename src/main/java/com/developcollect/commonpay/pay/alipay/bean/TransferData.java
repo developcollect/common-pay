@@ -1,7 +1,7 @@
 package com.developcollect.commonpay.pay.alipay.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.developcollect.commonpay.pay.ITransfer;
+import com.developcollect.commonpay.pay.ITransferDTO;
 import com.developcollect.commonpay.utils.UnitUtil;
 import lombok.Data;
 
@@ -90,19 +90,19 @@ public class TransferData implements Serializable {
     private String businessParams;
 
 
-    public static TransferData of(ITransfer transfer) {
+    public static TransferData of(ITransferDTO transferDTO) {
         TransferData transferData = new TransferData();
         transferData.setBizScene("DIRECT_TRANSFER");
-        transferData.setOutBizNo(transfer.getOutTransferNo());
-        transferData.setOrderTitle(transfer.getDescription());
+        transferData.setOutBizNo(transferDTO.getOutTransferNo());
+        transferData.setOrderTitle(transferDTO.getDescription());
         transferData.setProductCode("TRANS_ACCOUNT_NO_PWD");
-        transferData.setTransAmount(UnitUtil.convertFenToYuanStr(transfer.getAmount()));
+        transferData.setTransAmount(UnitUtil.convertFenToYuanStr(transferDTO.getAmount()));
         Payee payee = new Payee();
-        payee.setIdentity(transfer.getAccount());
+        payee.setIdentity(transferDTO.getAccount());
         payee.setIdentityType("ALIPAY_LOGON_ID");
-        payee.setName(transfer.getReUserName());
-        if (transfer.needCheckName()) {
-            payee.setName(transfer.getReUserName());
+        payee.setName(transferDTO.getReUserName());
+        if (transferDTO.needCheckName()) {
+            payee.setName(transferDTO.getReUserName());
         }
         transferData.setPayeeInfo(payee);
         return transferData;

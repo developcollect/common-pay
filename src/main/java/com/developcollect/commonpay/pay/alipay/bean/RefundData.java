@@ -1,8 +1,8 @@
 package com.developcollect.commonpay.pay.alipay.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.developcollect.commonpay.pay.IOrder;
-import com.developcollect.commonpay.pay.IRefund;
+import com.developcollect.commonpay.pay.IPayDTO;
+import com.developcollect.commonpay.pay.IRefundDTO;
 import com.developcollect.commonpay.utils.UnitUtil;
 import lombok.Data;
 
@@ -84,13 +84,13 @@ public class RefundData implements Serializable {
         return UnitUtil.convertFenToYuanStr(refundAmount);
     }
 
-    public static RefundData of(IOrder order, IRefund refund) {
+    public static RefundData of(IPayDTO payDTO, IRefundDTO refundDTO) {
         RefundData refundData = new RefundData();
-        refundData.setOutTradeNo(order.getOutTradeNo());
-        refundData.setRefundAmount(refund.getRefundFee());
+        refundData.setOutTradeNo(payDTO.getOutTradeNo());
+        refundData.setRefundAmount(refundDTO.getRefundFee());
         // 可选参数
         refundData.setRefundReason("正常退款");
-        refundData.setOutRequestNo(refund.getOutRefundNo());
+        refundData.setOutRequestNo(refundDTO.getOutRefundNo());
         return refundData;
     }
 }

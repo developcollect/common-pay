@@ -19,52 +19,52 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
-    public PayResponse payScan(IOrder order, String authCode) {
+    public PayResponse payScan(IPayDTO payDTO, String authCode) {
         throw new PayException("暂不支持扫用户付款码支付");
     }
 
     @Override
-    public PayAppResult payApp(IOrder order) {
+    public PayAppResult payApp(IPayDTO payDTO) {
         throw new PayException("暂不支持App支付");
     }
 
     @Override
-    public String payQrCode(IOrder order) {
+    public String payQrCode(IPayDTO payDTO) {
         throw new PayException("暂不支持二维码支付");
     }
 
     @Override
-    public String payPcForm(IOrder order) {
+    public String payPcForm(IPayDTO payDTO) {
         throw new PayException("暂不支持跳转表单支付");
     }
 
     @Override
-    public String payWapForm(IOrder order) {
+    public String payWapForm(IPayDTO payDTO) {
         throw new PayException("暂不支持跳转WAP表单支付");
     }
 
     @Override
-    public PayWxJsResult payWxJs(IOrder order, String openId) {
+    public PayWxJsResult payWxJs(IPayDTO payDTO, String openId) {
         throw new PayException("暂不支持微信JS支付");
     }
 
     @Override
-    public PayResponse paySync(IOrder order) {
+    public PayResponse paySync(IPayDTO payDTO) {
         throw new PayException("暂不支持同步调用支付");
     }
 
     @Override
-    public PayResponse payQuery(IOrder order) {
+    public PayResponse payQuery(IPayDTO payDTO) {
         throw new PayException("暂不支持支付结果查询");
     }
 
     @Override
-    public RefundResponse refundSync(IOrder order, IRefund refund) {
+    public RefundResponse refundSync(IPayDTO payDTO, IRefundDTO refundDTO) {
         throw new PayException("暂不支持退款");
     }
 
     @Override
-    public TransferResponse transferSync(ITransfer transfer) {
+    public TransferResponse transferSync(ITransferDTO transferDTO) {
         throw new PayException("暂不支持转账");
     }
 }

@@ -1,11 +1,10 @@
 package com.developcollect.commonpay.pay.alipay.bean;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.developcollect.commonpay.PayPlatform;
 import com.developcollect.commonpay.config.GlobalConfig;
-import com.developcollect.commonpay.pay.IOrder;
+import com.developcollect.commonpay.pay.IPayDTO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -68,27 +67,17 @@ public class PayData implements Serializable {
     }
 
 
-    public static PayData of(IOrder order) {
+    public static PayData of(IPayDTO payDTO) {
         PayData payData = new PayData();
-        payData.setOutTradeNo(order.getOutTradeNo());
+        payData.setOutTradeNo(payDTO.getOutTradeNo());
 
-        payData.setSubject("商品_" + order.getOutTradeNo());
-        payData.setBody("商品_" + order.getOutTradeNo());
-        payData.setTotalAmount(order.getTotalFee());
+        payData.setSubject("商品_" + payDTO.getOutTradeNo());
+        payData.setBody("商品_" + payDTO.getOutTradeNo());
+        payData.setTotalAmount(payDTO.getTotalFee());
         // FIXME: 2020/1/9 沙箱环境加了这个参数后导致   订单信息无法识别,建议联系卖家。错误码:INVALID_PARAMETER
         if (GlobalConfig.getPayConfig(PayPlatform.ALI_PAY).isDebug() == false) {
-            payData.setTimeExpire(DateUtil.format(order.getTimeExpire(), "yyyy-MM-dd HH:mm:ss"));
+            payData.setTimeExpire(DateUtil.format(payDTO.getTimeExpire(), "yyyy-MM-dd HH:mm:ss"));
         }
         return payData;
-    }
-
-    public static void main(String[] args) {
-        PayData payData = new PayData();
-        payData.setOutTradeNo("201978458585");
-        payData.setSubject("iphone 11 pro");
-        payData.setBody("iphone 11 pro");
-        payData.setTotalAmount(1544L);
-        String s = JSONObject.toJSONString(payData);
-        System.out.println(s);
     }
 }

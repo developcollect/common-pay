@@ -1,7 +1,7 @@
 package com.developcollect.commonpay.config;
 
-import com.developcollect.commonpay.pay.IOrder;
-import com.developcollect.commonpay.pay.IRefund;
+import com.developcollect.commonpay.pay.IPayDTO;
+import com.developcollect.commonpay.pay.IRefundDTO;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -31,38 +31,38 @@ public abstract class AbstractPayConfig {
     /**
      * 退款结果异步通知地址生成器
      */
-    protected BiFunction<IOrder, IRefund, String> refundNotifyUrlGenerator;
+    protected BiFunction<IPayDTO, IRefundDTO, String> refundNotifyUrlGenerator;
 
     /**
      * 支付结果异步通知地址生成器
      */
-    protected Function<IOrder, String> payNotifyUrlGenerator;
+    protected Function<IPayDTO, String> payNotifyUrlGenerator;
 
 
     /**
      * 支付二维码访问链接生成器
      */
-    protected BiFunction<IOrder, String, String> payQrCodeAccessUrlGenerator;
+    protected BiFunction<IPayDTO, String, String> payQrCodeAccessUrlGenerator;
 
     /**
      * PC支付页面访问链接生成器
      */
-    protected BiFunction<IOrder, String, String> pcPayFormHtmlAccessUrlGenerator;
+    protected BiFunction<IPayDTO, String, String> pcPayFormHtmlAccessUrlGenerator;
 
     /**
      * PC支付完成跳转地址生成器
      */
-    protected Function<IOrder, String> pcReturnUrlGenerator;
+    protected Function<IPayDTO, String> pcReturnUrlGenerator;
 
     /**
      * WAP支付页面访问链接生成器
      */
-    protected BiFunction<IOrder, String, String> wapPayFormHtmlAccessUrlGenerator;
+    protected BiFunction<IPayDTO, String, String> wapPayFormHtmlAccessUrlGenerator;
 
     /**
      * WAP支付完成跳转地址生成器
      */
-    protected Function<IOrder, String> wapReturnUrlGenerator;
+    protected Function<IPayDTO, String> wapReturnUrlGenerator;
 
     /**
      * 扩展Map
@@ -86,7 +86,7 @@ public abstract class AbstractPayConfig {
      * @param key key
      * @return java.lang.Object
      */
-    public <T> T getExtend(String key) {
+    public <T> T getExt(String key) {
         return (T) extendMap.get(key);
     }
 
@@ -97,7 +97,7 @@ public abstract class AbstractPayConfig {
      * @param extend 自定义配置值
      * @return java.lang.Object
      */
-    public Object putExtend(String key, Object extend) {
+    public Object putExt(String key, Object extend) {
         extendMap.put(key, extend);
         return this;
     }

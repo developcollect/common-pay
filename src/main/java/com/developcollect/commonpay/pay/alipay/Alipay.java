@@ -86,16 +86,16 @@ public class Alipay extends AbstractPay {
      * https://opendocs.alipay.com/open/194/106039
      */
     @Override
-    public PayResponse payScan(IOrder order, String authCode) {
+    public PayResponse payScan(IPayDTO payDTO, String authCode) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
 
             AlipayTradePayRequest alipayTradePayRequest = new AlipayTradePayRequest();
-            alipayTradePayRequest.setNotifyUrl(aliPayConfig.getPayNotifyUrlGenerator().apply(order));
+            alipayTradePayRequest.setNotifyUrl(aliPayConfig.getPayNotifyUrlGenerator().apply(payDTO));
 
 
-            PayData payData = PayData.of(order);
+            PayData payData = PayData.of(payDTO);
             payData.setAuthCode(authCode);
             payData.setProductCode("FACE_TO_FACE_PAYMENT");
 
@@ -119,19 +119,19 @@ public class Alipay extends AbstractPay {
      * 支付宝预下单扫码支付
      * https://docs.open.alipay.com/api_1/alipay.trade.precreate
      *
-     * @param order
+     * @param payDTO
      * @return java.lang.String
      */
     @Override
-    public String payQrCode(IOrder order) {
+    public String payQrCode(IPayDTO payDTO) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
 
             AlipayTradePrecreateRequest preCreateRequest = new AlipayTradePrecreateRequest();
-            preCreateRequest.setNotifyUrl(aliPayConfig.getPayNotifyUrlGenerator().apply(order));
+            preCreateRequest.setNotifyUrl(aliPayConfig.getPayNotifyUrlGenerator().apply(payDTO));
 
-            PayData payData = PayData.of(order);
+            PayData payData = PayData.of(payDTO);
             payData.setProductCode("FACE_TO_FACE_PAYMENT");
 
             String param = JSONObject.toJSONString(payData);
@@ -163,26 +163,26 @@ public class Alipay extends AbstractPay {
      * <p>
      * https://opendocs.alipay.com/open/203/107090
      *
-     * @param order
+     * @param payDTO
      * @return java.lang.String
      */
     @Override
-    public String payWapForm(IOrder order) {
+    public String payWapForm(IPayDTO payDTO) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
 
             // 创建API对应的request
             AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();
-            String notifyUrl = aliPayConfig.getPayNotifyUrlGenerator().apply(order);
+            String notifyUrl = aliPayConfig.getPayNotifyUrlGenerator().apply(payDTO);
             alipayRequest.setNotifyUrl(notifyUrl);
 
             // 在公共参数中设置回跳和通知地址
             if (aliPayConfig.getWapReturnUrlGenerator() != null) {
-                alipayRequest.setReturnUrl(aliPayConfig.getWapReturnUrlGenerator().apply(order));
+                alipayRequest.setReturnUrl(aliPayConfig.getWapReturnUrlGenerator().apply(payDTO));
             }
 
-            PayData payData = PayData.of(order);
+            PayData payData = PayData.of(payDTO);
             payData.setProductCode("QUICK_WAP_PAY");
 
             try {
@@ -208,26 +208,26 @@ public class Alipay extends AbstractPay {
      * 支付宝统一收单下单并支付页面
      * https://opendocs.alipay.com/apis/api_1/alipay.trade.page.pay
      *
-     * @param order
+     * @param payDTO
      * @return java.lang.String
      */
     @Override
-    public String payPcForm(IOrder order) {
+    public String payPcForm(IPayDTO payDTO) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
 
             // 创建API对应的request
             AlipayTradePagePayRequest alipayRequest = new AlipayTradePagePayRequest();
-            String notifyUrl = aliPayConfig.getPayNotifyUrlGenerator().apply(order);
+            String notifyUrl = aliPayConfig.getPayNotifyUrlGenerator().apply(payDTO);
             alipayRequest.setNotifyUrl(notifyUrl);
 
             // 在公共参数中设置回跳和通知地址
             if (aliPayConfig.getPcReturnUrlGenerator() != null) {
-                alipayRequest.setReturnUrl(aliPayConfig.getPcReturnUrlGenerator().apply(order));
+                alipayRequest.setReturnUrl(aliPayConfig.getPcReturnUrlGenerator().apply(payDTO));
             }
 
-            PayData payData = PayData.of(order);
+            PayData payData = PayData.of(payDTO);
             payData.setProductCode("FAST_INSTANT_TRADE_PAY");
 
             String param = JSONObject.toJSONString(payData);
@@ -256,18 +256,18 @@ public class Alipay extends AbstractPay {
      * 订单查询
      * https://opendocs.alipay.com/apis/api_1/alipay.trade.query
      *
-     * @param order 订单
+     * @param payDTO 支付参数
      * @return 订单支付结果
      */
     @Override
-    public PayResponse payQuery(IOrder order) {
+    public PayResponse payQuery(IPayDTO payDTO) {
         try {
             AliPayConfig payConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(payConfig);
 
             AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
 
-            PayQueryData payQueryData = PayQueryData.of(order);
+            PayQueryData payQueryData = PayQueryData.of(payDTO);
 
             request.setBizContent(SerializeUtil.beanToJson(payQueryData));
 
@@ -279,13 +279,13 @@ public class Alipay extends AbstractPay {
             PayResponse payResponse = PayResponse.of(response);
             return payResponse;
         } catch (Exception e) {
-            log.error("支付宝订单[{}]查询失败", order.getOutTradeNo(), e);
+            log.error("支付宝订单[{}]查询失败", payDTO.getOutTradeNo(), e);
             return null;
         }
     }
 
     @Override
-    public RefundResponse refundSync(IOrder order, IRefund refund) {
+    public RefundResponse refundSync(IPayDTO payDTO, IRefundDTO refundDTO) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
@@ -293,7 +293,7 @@ public class Alipay extends AbstractPay {
             // 创建API对应的request
             AlipayTradeRefundRequest refundRequest = new AlipayTradeRefundRequest();
 
-            RefundData refundData = RefundData.of(order, refund);
+            RefundData refundData = RefundData.of(payDTO, refundDTO);
             String param = JSONObject.toJSONString(refundData);
 
             log.debug("支付宝退款参数: {}", param);
@@ -309,7 +309,7 @@ public class Alipay extends AbstractPay {
             refundResponse.setSuccess(true);
             refundResponse.setRawObj(alipayTradeRefundResponse);
             refundResponse.setPayPlatform(PayPlatform.ALI_PAY);
-            refundResponse.setOutRefundNo(refund.getOutRefundNo());
+            refundResponse.setOutRefundNo(refundDTO.getOutRefundNo());
             return refundResponse;
         } catch (Throwable throwable) {
             log.error("支付宝退款失败");
@@ -320,14 +320,14 @@ public class Alipay extends AbstractPay {
     }
 
     @Override
-    public TransferResponse transferSync(ITransfer transfer) {
+    public TransferResponse transferSync(ITransferDTO transferDTO) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
 
             // 创建API对应的request
             AlipayFundTransUniTransferRequest transferRequest = new AlipayFundTransUniTransferRequest();
-            TransferData transferData = TransferData.of(transfer);
+            TransferData transferData = TransferData.of(transferDTO);
 
             String param = JSONObject.toJSONString(transferData);
             log.debug("支付宝转账参数: {}", param);

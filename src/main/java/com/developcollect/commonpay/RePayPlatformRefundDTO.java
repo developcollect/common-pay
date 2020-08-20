@@ -1,6 +1,6 @@
 package com.developcollect.commonpay;
 
-import com.developcollect.commonpay.pay.IRefund;
+import com.developcollect.commonpay.pay.IRefundDTO;
 import lombok.RequiredArgsConstructor;
 
 
@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
  * @since 1.8.6
  */
 @RequiredArgsConstructor
-public class RePayPlatformRefund implements IRefund {
+public class RePayPlatformRefundDTO implements IRefundDTO {
 
     private final int payPlatform;
-    private final IRefund refund;
+    private final IRefundDTO refund;
 
 
     @Override
@@ -35,5 +35,15 @@ public class RePayPlatformRefund implements IRefund {
     @Override
     public Object getSource() {
         return refund.getSource();
+    }
+
+    @Override
+    public Object getExt(String key) {
+        return refund.getExt(key);
+    }
+
+    @Override
+    public void putExt(String key, Object extParameter) {
+        refund.putExt(key, extParameter);
     }
 }

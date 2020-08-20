@@ -1,6 +1,6 @@
 package com.developcollect.commonpay.notice;
 
-import com.developcollect.commonpay.pay.IOrder;
+import com.developcollect.commonpay.pay.IPayDTO;
 
 
 /**
@@ -20,5 +20,5 @@ public interface IUnconfirmedOrderFetcher {
      * @author zak
      * @since 1.0.0
      */
-    Page<IOrder> getUnconfirmedOrders(Page page);
+    Page<IPayDTO> getUnconfirmedOrders(Page page);
 }

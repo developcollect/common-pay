@@ -12,63 +12,63 @@ public interface Pay {
     /**
      * 扫用户付款码支付
      *
-     * @param order    订单
+     * @param payDTO    支付参数
      * @param authCode 付款码
      */
-    PayResponse payScan(IOrder order, String authCode);
+    PayResponse payScan(IPayDTO payDTO, String authCode);
 
     /**
      * app支付
      * 有些平台(如: 微信)在app支付时需要后台预下单,然后app根据预下单结果进行支付
      * 有的(如: 支付宝)不需要,只要app直接调用平台支付接口就行
      */
-    PayAppResult payApp(IOrder order);
+    PayAppResult payApp(IPayDTO payDTO);
 
 
     /**
      * 支付
      * 通过付款二维码支付
      *
-     * @param order 支付订单
+     * @param payDTO 支付参数
      * @return String 二维码值
      * @author zak
      * @since 1.0.0
      */
-    String payQrCode(IOrder order);
+    String payQrCode(IPayDTO payDTO);
 
 
     /**
      * 通过跳转到第三方的支付PC表单实现支付
      *
-     * @param order 支付订单
+     * @param payDTO 支付参数
      * @return String html代码片段
      * @author zak
      * @since 1.0.0
      */
-    String payPcForm(IOrder order);
+    String payPcForm(IPayDTO payDTO);
 
     /**
      * 通过跳转到第三方的支付WAP表单实现支付
      *
-     * @param order
+     * @param payDTO
      * @return java.lang.String
      * @author Zhu Kaixiao
      * @date 2020/8/15 10:55
      */
-    String payWapForm(IOrder order);
+    String payWapForm(IPayDTO payDTO);
 
 
     /**
      * 在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
      * 仅微信支持
      *
-     * @param order 订单
+     * @param payDTO 支付参数
      * @param openId 微信用户在商户对应appid下的唯一标识。
      * @return PayWxJsResult
      * @author Zhu Kaixiao
      * @date 2020/8/15 13:49
      */
-    PayWxJsResult payWxJs(IOrder order, String openId);
+    PayWxJsResult payWxJs(IPayDTO payDTO, String openId);
 
     /**
      * 同步调用支付
@@ -77,7 +77,7 @@ public interface Pay {
      * @author zak
      * @since 1.0.0
      */
-    PayResponse paySync(IOrder order);
+    PayResponse paySync(IPayDTO payDTO);
 
 
     /**
@@ -86,27 +86,27 @@ public interface Pay {
      * @author zak
      * @since 1.0.0
      */
-    PayResponse payQuery(IOrder order);
+    PayResponse payQuery(IPayDTO payDTO);
 
     /**
      * 退款
      *
-     * @param refund 退款信息
+     * @param refundDTO 退款信息
      * @return 退款结果
      * @author zak
      * @since 1.0.0
      */
-    RefundResponse refundSync(IOrder order, IRefund refund);
+    RefundResponse refundSync(IPayDTO payDTO, IRefundDTO refundDTO);
 
 
     /**
      * 转账
      *
-     * @param transfer 转账信息
+     * @param transferDTO 转账信息
      * @return 转账结果
      * @author zak
      * @since 1.0.0
      */
-    TransferResponse transferSync(ITransfer transfer);
+    TransferResponse transferSync(ITransferDTO transferDTO);
 
 }

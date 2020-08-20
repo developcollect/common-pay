@@ -38,35 +38,35 @@ public class WxPay extends AbstractPay {
         return wxPay;
     }
 
-    private Map<String, String> convertToPayReqMap(IOrder order) {
+    private Map<String, String> convertToPayReqMap(IPayDTO payDTO) {
         Map<String, String> reqData = new HashMap<>(16);
-        reqData.put("body", "商品_" + order.getOutTradeNo());
-        reqData.put("out_trade_no", order.getOutTradeNo());
+        reqData.put("body", "商品_" + payDTO.getOutTradeNo());
+        reqData.put("out_trade_no", payDTO.getOutTradeNo());
         // 实付款 = 订单总额 + 运费 - 折扣
-        reqData.put("total_fee", String.valueOf(order.getTotalFee()));
+        reqData.put("total_fee", String.valueOf(payDTO.getTotalFee()));
         // 这个ip好像可以随便填
         reqData.put("spbill_create_ip", "117.43.68.32");
-        if (order.getTimeStart() != null) {
-            reqData.put("time_start", DateUtil.format(order.getTimeStart(), "yyyyMMddHHmmss"));
+        if (payDTO.getTimeStart() != null) {
+            reqData.put("time_start", DateUtil.format(payDTO.getTimeStart(), "yyyyMMddHHmmss"));
         }
         // time_expire只能第一次下单传值，不允许二次修改，二次修改微信接口将报错。
         // 目前根据订单中是否有微信支付订单号判断是否已下单
-        if (order.getTimeExpire() != null && order.getTradeNo() == null) {
-            reqData.put("time_expire", DateUtil.format(order.getTimeExpire(), "yyyyMMddHHmmss"));
+        if (payDTO.getTimeExpire() != null && payDTO.getTradeNo() == null) {
+            reqData.put("time_expire", DateUtil.format(payDTO.getTimeExpire(), "yyyyMMddHHmmss"));
         }
 
         return reqData;
     }
 
-    private Map<String, String> convertToRefundReqMap(IOrder order, IRefund refund) {
+    private Map<String, String> convertToRefundReqMap(IPayDTO payDTO, IRefundDTO refund) {
         Map<String, String> reqData = new HashMap<>(16);
         // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
         //transaction_id、out_trade_no二选一，如果同时存在优先级：transaction_id> out_trade_no
-        reqData.put("out_trade_no", order.getOutTradeNo());
+        reqData.put("out_trade_no", payDTO.getOutTradeNo());
         // 商户系统内部的退款单号，商户系统内部唯一，只能是数字、大小写字母_-|*@ ，同一退款单号多次请求只退一笔
         reqData.put("out_refund_no", refund.getOutRefundNo());
         // 订单总金额，单位为分，只能为整数，详见支付金额
-        reqData.put("total_fee", String.valueOf(order.getTotalFee()));
+        reqData.put("total_fee", String.valueOf(payDTO.getTotalFee()));
         // 退款总金额，单位为分，只能为整数，详见支付金额
         reqData.put("refund_fee", String.valueOf(refund.getRefundFee()));
         // 异步接收微信支付退款结果通知的回调地址，通知URL必须为外网可访问的url，不允许带参数
@@ -77,7 +77,7 @@ public class WxPay extends AbstractPay {
         return reqData;
     }
 
-    private Map<String, String> convertToTransferReqMap(ITransfer transfer) {
+    private Map<String, String> convertToTransferReqMap(ITransferDTO transfer) {
         Map<String, String> reqData = new HashMap<>(16);
         // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有其它字符)
         reqData.put("partner_trade_no", transfer.getOutTransferNo());
@@ -101,7 +101,7 @@ public class WxPay extends AbstractPay {
     /**
      * 微信统一下单
      *
-     * @param order       订单
+     * @param payDTO       订单
      * @param wxPayConfig 微信支付配置
      * @param tradeType   交易类型
      *                    JSAPI -JSAPI支付
@@ -111,15 +111,15 @@ public class WxPay extends AbstractPay {
      * @author Zhu Kaixiao
      * @date 2020/8/15 14:18
      */
-    private Map<String, String> unifiedOrder(IOrder order, WxPayConfig wxPayConfig, String tradeType, String openId) throws Exception {
+    private Map<String, String> unifiedOrder(IPayDTO payDTO, WxPayConfig wxPayConfig, String tradeType, String openId) throws Exception {
         WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
-        Map<String, String> reqData = convertToPayReqMap(order);
+        Map<String, String> reqData = convertToPayReqMap(payDTO);
         reqData.put("trade_type", tradeType);
         if (StrUtil.isNotBlank(openId)) {
             // trade_type=JSAPI时（即JSAPI支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识。
             reqData.put("openid", openId);
         }
-        reqData.put("notify_url", wxPayConfig.getPayNotifyUrlGenerator().apply(order));
+        reqData.put("notify_url", wxPayConfig.getPayNotifyUrlGenerator().apply(payDTO));
 
         if (log.isDebugEnabled()) {
             log.debug("微信支付参数:{}", JSONObject.toJSONString(reqData));
@@ -137,11 +137,11 @@ public class WxPay extends AbstractPay {
     }
 
     @Override
-    public PayResponse payScan(IOrder order, String authCode) {
+    public PayResponse payScan(IPayDTO payDTO, String authCode) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
             WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
-            Map<String, String> reqData = convertToPayReqMap(order);
+            Map<String, String> reqData = convertToPayReqMap(payDTO);
             reqData.put("auth_code", authCode);
             Map<String, String> map = wxSdkPay.microPay(reqData);
             if ("FAIL".equals(map.get("return_code"))) {
@@ -173,14 +173,14 @@ public class WxPay extends AbstractPay {
      * <p>
      * https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_3
      *
-     * @param order
+     * @param payDTO
      */
     @Override
-    public PayAppResult payApp(IOrder order) {
+    public PayAppResult payApp(IPayDTO payDTO) {
 
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(order, wxPayConfig, "APP", null);
+            Map<String, String> map = unifiedOrder(payDTO, wxPayConfig, "APP", null);
 
             String prepayId = map.get("prepay_id");
 
@@ -218,14 +218,14 @@ public class WxPay extends AbstractPay {
      * 微信扫码支付
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_1
      *
-     * @param order
+     * @param payDTO
      * @return java.lang.String
      */
     @Override
-    public String payQrCode(IOrder order) {
+    public String payQrCode(IPayDTO payDTO) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(order, wxPayConfig, "NATIVE", null);
+            Map<String, String> map = unifiedOrder(payDTO, wxPayConfig, "NATIVE", null);
 
             String codeUrl = map.get("code_url");
             log.debug("微信支付,code_url: {}", codeUrl);
@@ -242,14 +242,14 @@ public class WxPay extends AbstractPay {
      * 微信js支付
      * https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
      *
-     * @param order
+     * @param payDTO
      * @return com.developcollect.commonpay.pay.WxJsPayResult
      */
     @Override
-    public PayWxJsResult payWxJs(IOrder order, String openId) {
+    public PayWxJsResult payWxJs(IPayDTO payDTO, String openId) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(order, wxPayConfig, "JSAPI", openId);
+            Map<String, String> map = unifiedOrder(payDTO, wxPayConfig, "JSAPI", openId);
             String prepayId = map.get("prepay_id");
 
             Map<String, String> wxJsPayMap = new HashMap<>(8);
@@ -276,21 +276,21 @@ public class WxPay extends AbstractPay {
      * 微信客户端外的移动端网页支付
      * https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_4
      *
-     * @param order
+     * @param payDTO
      * @return java.lang.String
      * @author Zhu Kaixiao
      * @date 2020/8/15 14:23
      */
     @Override
-    public String payWapForm(IOrder order) {
+    public String payWapForm(IPayDTO payDTO) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(order, wxPayConfig, "MWEB", null);
+            Map<String, String> map = unifiedOrder(payDTO, wxPayConfig, "MWEB", null);
 
             String mwebUrl = map.get("mweb_url");
 
             if (wxPayConfig.getWapReturnUrlGenerator() != null) {
-                mwebUrl = mwebUrl + "&redirect_url=" + URLUtil.encode(wxPayConfig.getWapReturnUrlGenerator().apply(order));
+                mwebUrl = mwebUrl + "&redirect_url=" + URLUtil.encode(wxPayConfig.getWapReturnUrlGenerator().apply(payDTO));
             }
 
             log.debug("微信支付,mweb_url: {}", mwebUrl);
@@ -307,15 +307,15 @@ public class WxPay extends AbstractPay {
      * 微信订单查询
      * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_2
      *
-     * @param order
+     * @param payDTO
      * @return
      */
     @Override
-    public PayResponse payQuery(IOrder order) {
+    public PayResponse payQuery(IPayDTO payDTO) {
         try {
             WxPayConfig payConfig = getPayConfig();
             WXPay wxSdkPay = getWxSdkPay(payConfig);
-            Map<String, String> reqData = convertToPayQueryMap(order);
+            Map<String, String> reqData = convertToPayQueryMap(payDTO);
             Map<String, String> map = wxSdkPay.orderQuery(reqData);
 
             if ("FAIL".equals(map.get("return_code"))) {
@@ -334,28 +334,28 @@ public class WxPay extends AbstractPay {
             payResponse.setRawObj((Serializable) map);
             return payResponse;
         } catch (Exception e) {
-            log.error("微信订单[{}]查询失败", order.getOutTradeNo(), e);
+            log.error("微信订单[{}]查询失败", payDTO.getOutTradeNo(), e);
             return null;
         }
     }
 
-    private Map<String, String> convertToPayQueryMap(IOrder order) {
+    private Map<String, String> convertToPayQueryMap(IPayDTO payDTO) {
         Map<String, String> reqData = new HashMap<>(16);
-        reqData.put("out_trade_no", order.getOutTradeNo());
+        reqData.put("out_trade_no", payDTO.getOutTradeNo());
         return reqData;
     }
 
     @Override
-    public RefundResponse refundSync(IOrder order, IRefund refund) {
+    public RefundResponse refundSync(IPayDTO payDTO, IRefundDTO refundDTO) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
             WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
 
-            Map<String, String> reqData = convertToRefundReqMap(order, refund);
+            Map<String, String> reqData = convertToRefundReqMap(payDTO, refundDTO);
 
             // 如果参数中传了notify_url，则商户平台上配置的回调地址将不会生效。
             if (wxPayConfig.getRefundNotifyUrlGenerator() != null) {
-                reqData.put("notify_url", wxPayConfig.getRefundNotifyUrlGenerator().apply(order, refund));
+                reqData.put("notify_url", wxPayConfig.getRefundNotifyUrlGenerator().apply(payDTO, refundDTO));
             }
 
             if (log.isDebugEnabled()) {
@@ -393,13 +393,13 @@ public class WxPay extends AbstractPay {
      * （获取openid参见微信公众平台开发者文档： https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html）
      */
     @Override
-    public TransferResponse transferSync(ITransfer transfer) {
+    public TransferResponse transferSync(ITransferDTO transferDTO) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
             WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
 
 
-            Map<String, String> reqData = convertToTransferReqMap(transfer);
+            Map<String, String> reqData = convertToTransferReqMap(transferDTO);
 
             if (log.isDebugEnabled()) {
                 log.debug("微信转账参数:{}", JSONObject.toJSONString(reqData));

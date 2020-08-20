@@ -2,7 +2,7 @@ package com.developcollect.commonpay.notice;
 
 import cn.hutool.core.thread.ThreadFactoryBuilder;
 import com.developcollect.commonpay.config.GlobalConfig;
-import com.developcollect.commonpay.pay.IOrder;
+import com.developcollect.commonpay.pay.IPayDTO;
 import com.developcollect.commonpay.pay.Pay;
 import com.developcollect.commonpay.pay.PayResponse;
 
@@ -56,14 +56,14 @@ public class QueryNoticeManager {
             return;
         }
 
-        Page<IOrder> page = new Page<>(1, 1);
+        Page<IPayDTO> page = new Page<>(1, 1);
 
         do {
             page = unconfirmedOrderFetcher.getUnconfirmedOrders(page);
 
-            for (IOrder order : page.getRecords()) {
-                Pay pay = GlobalConfig.payFactory().createPay(order.getPayPlatform());
-                PayResponse payResponse = pay.payQuery(order);
+            for (IPayDTO payDTO : page.getRecords()) {
+                Pay pay = GlobalConfig.payFactory().createPay(payDTO.getPayPlatform());
+                PayResponse payResponse = pay.payQuery(payDTO);
 
                 if (payResponse != null) {
                     GlobalConfig.payBroadcaster().broadcast(payResponse);

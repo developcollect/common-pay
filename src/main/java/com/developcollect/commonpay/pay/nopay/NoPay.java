@@ -13,22 +13,22 @@ import com.developcollect.commonpay.pay.*;
 public class NoPay extends AbstractPay {
 
     @Override
-    public String payPcForm(IOrder order) {
+    public String payPcForm(IPayDTO payDTO) {
         throw new PayException("支付方式不存在");
     }
 
     @Override
-    public String payQrCode(IOrder order) {
+    public String payQrCode(IPayDTO payDTO) {
         throw new PayException("支付方式不存在");
     }
 
     @Override
-    public TransferResponse transferSync(ITransfer transfer) {
+    public TransferResponse transferSync(ITransferDTO transferDTO) {
         throw new PayException("支付方式不存在");
     }
 
     @Override
-    public RefundResponse refundSync(IOrder order, IRefund refund) {
+    public RefundResponse refundSync(IPayDTO payDTO, IRefundDTO refundDTO) {
         throw new PayException("支付方式不存在");
     }
 

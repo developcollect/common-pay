@@ -1,6 +1,6 @@
 package com.developcollect.commonpay;
 
-import com.developcollect.commonpay.pay.IOrder;
+import com.developcollect.commonpay.pay.IPayDTO;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
  * @since 1.8.6
  */
 @RequiredArgsConstructor
-public class RePayPlatformOrder implements IOrder {
+public class RePayPlatformPayDTO implements IPayDTO {
 
     private final int payPlatform;
-    private final IOrder order;
+    private final IPayDTO order;
 
 
     @Override
@@ -51,5 +51,15 @@ public class RePayPlatformOrder implements IOrder {
     @Override
     public Object getSource() {
         return order.getSource();
+    }
+
+    @Override
+    public Object getExt(String key) {
+        return order.getExt(key);
+    }
+
+    @Override
+    public void putExt(String key, Object extParameter) {
+        order.putExt(key, extParameter);
     }
 }

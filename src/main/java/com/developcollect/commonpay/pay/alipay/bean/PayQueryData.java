@@ -1,7 +1,7 @@
 package com.developcollect.commonpay.pay.alipay.bean;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.developcollect.commonpay.pay.IOrder;
+import com.developcollect.commonpay.pay.IPayDTO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,10 +22,10 @@ public class PayQueryData implements Serializable {
     private String tradeNo;
 
 
-    public static PayQueryData of(IOrder order) {
+    public static PayQueryData of(IPayDTO payDTO) {
         PayQueryData payQueryData = new PayQueryData();
-        payQueryData.setOutTradeNo(order.getOutTradeNo());
-        payQueryData.setTradeNo(order.getTradeNo());
+        payQueryData.setOutTradeNo(payDTO.getOutTradeNo());
+        payQueryData.setTradeNo(payDTO.getTradeNo());
         return payQueryData;
     }
 }
