@@ -10,7 +10,7 @@ import lombok.Data;
  * 仅限于授权后使用，禁止非授权传阅以及私自用于商业目的。
  */
 @Data
-public class DefaultTransferDTO extends BaseDTO implements ITransferDTO {
+public class DefaultTransferDTO extends ExtDto implements ITransferDTO {
 
     /**
      * 商户转账单号

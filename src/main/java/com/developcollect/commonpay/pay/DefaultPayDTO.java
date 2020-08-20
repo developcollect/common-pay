@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 仅限于授权后使用，禁止非授权传阅以及私自用于商业目的。
  */
 @Data
-public class DefaultPayDTO extends BaseDTO implements IPayDTO {
+public class DefaultPayDTO extends ExtDto implements IPayDTO {
 
     /**
      * 商户订单号
