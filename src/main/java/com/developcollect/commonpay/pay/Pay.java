@@ -1,12 +1,14 @@
 package com.developcollect.commonpay.pay;
 
+import java.io.Serializable;
+
 /**
  * 支付抽象接口
  *
  * @author zak
  * @since 1.0.0
  */
-public interface Pay {
+public interface Pay extends Serializable {
 
 
     /**

@@ -10,16 +10,18 @@ import java.util.Map;
  * @copyright 江西金磊科技发展有限公司 All rights reserved. Notice
  * 仅限于授权后使用，禁止非授权传阅以及私自用于商业目的。
  */
-public abstract class BaseDTO {
+public abstract class BaseDTO implements IExtDto {
 
     private Map<String, Object> extMap = new HashMap<>();
 
 
+    @Override
     public void putExt(String key, Object extParameter) {
         extMap.put(key, extParameter);
     }
 
-    public Object getExt(String key) {
-        return extMap.get(key);
+    @Override
+    public <T> T getExt(String key) {
+        return (T) extMap.get(key);
     }
 }
