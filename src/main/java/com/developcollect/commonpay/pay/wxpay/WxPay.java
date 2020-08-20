@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.developcollect.commonpay.ExtKeys;
 import com.developcollect.commonpay.PayPlatform;
 import com.developcollect.commonpay.config.WxPayConfig;
 import com.developcollect.commonpay.exception.PayException;
@@ -137,12 +138,12 @@ public class WxPay extends AbstractPay {
     }
 
     @Override
-    public PayResponse payScan(IPayDTO payDTO, String authCode) {
+    public PayResponse payScan(IPayDTO payDTO) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
             WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
             Map<String, String> reqData = convertToPayReqMap(payDTO);
-            reqData.put("auth_code", authCode);
+            reqData.put("auth_code", payDTO.getExt(ExtKeys.PAY_SCAN_AUTH_CODE).toString());
             Map<String, String> map = wxSdkPay.microPay(reqData);
             if ("FAIL".equals(map.get("return_code"))) {
                 throw new PayException(map.get("return_msg"));
@@ -246,10 +247,11 @@ public class WxPay extends AbstractPay {
      * @return com.developcollect.commonpay.pay.WxJsPayResult
      */
     @Override
-    public PayWxJsResult payWxJs(IPayDTO payDTO, String openId) {
+    public PayWxJsResult payWxJs(IPayDTO payDTO) {
         try {
             WxPayConfig wxPayConfig = getPayConfig();
-            Map<String, String> map = unifiedOrder(payDTO, wxPayConfig, "JSAPI", openId);
+            Map<String, String> map = unifiedOrder(payDTO, wxPayConfig, "JSAPI",
+                    payDTO.getExt(ExtKeys.PAY_WXJS_OPENID).toString());
             String prepayId = map.get("prepay_id");
 
             Map<String, String> wxJsPayMap = new HashMap<>(8);

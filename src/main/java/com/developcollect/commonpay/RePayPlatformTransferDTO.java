@@ -23,6 +23,11 @@ public class RePayPlatformTransferDTO implements ITransferDTO {
     }
 
     @Override
+    public String getTransferNo() {
+        return transfer.getTransferNo();
+    }
+
+    @Override
     public String getAccount() {
         return transfer.getAccount();
     }

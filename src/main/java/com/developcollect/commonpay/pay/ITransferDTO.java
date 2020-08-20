@@ -20,6 +20,17 @@ public interface ITransferDTO<SOURCE> {
      */
     String getOutTransferNo();
 
+    /**
+     * 支付平台转账编号
+     *
+     * @return 转账编号
+     * @author zak
+     * @since 1.0.0
+     */
+    default String getTransferNo() {
+        return null;
+    }
+
 
     /**
      * 转账到的账号

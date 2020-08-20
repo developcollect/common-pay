@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 重新指定支付平台订单
+ * 重新指定支付平台支付信息
  *
  * @author zak
  * @since 1.8.6
@@ -15,32 +15,32 @@ import java.time.LocalDateTime;
 public class RePayPlatformPayDTO implements IPayDTO {
 
     private final int payPlatform;
-    private final IPayDTO order;
+    private final IPayDTO payDTO;
 
 
     @Override
     public String getOutTradeNo() {
-        return order.getOutTradeNo();
+        return payDTO.getOutTradeNo();
     }
 
     @Override
     public String getTradeNo() {
-        return order.getTradeNo();
+        return payDTO.getTradeNo();
     }
 
     @Override
     public Long getTotalFee() {
-        return order.getTotalFee();
+        return payDTO.getTotalFee();
     }
 
     @Override
     public LocalDateTime getTimeStart() {
-        return order.getTimeStart();
+        return payDTO.getTimeStart();
     }
 
     @Override
     public LocalDateTime getTimeExpire() {
-        return order.getTimeExpire();
+        return payDTO.getTimeExpire();
     }
 
     @Override
@@ -50,16 +50,16 @@ public class RePayPlatformPayDTO implements IPayDTO {
 
     @Override
     public Object getSource() {
-        return order.getSource();
+        return payDTO.getSource();
     }
 
     @Override
     public Object getExt(String key) {
-        return order.getExt(key);
+        return payDTO.getExt(key);
     }
 
     @Override
     public void putExt(String key, Object extParameter) {
-        order.putExt(key, extParameter);
+        payDTO.putExt(key, extParameter);
     }
 }

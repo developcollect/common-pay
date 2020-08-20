@@ -13,9 +13,8 @@ public interface Pay {
      * 扫用户付款码支付
      *
      * @param payDTO    支付参数
-     * @param authCode 付款码
      */
-    PayResponse payScan(IPayDTO payDTO, String authCode);
+    PayResponse payScan(IPayDTO payDTO);
 
     /**
      * app支付
@@ -63,12 +62,11 @@ public interface Pay {
      * 仅微信支持
      *
      * @param payDTO 支付参数
-     * @param openId 微信用户在商户对应appid下的唯一标识。
      * @return PayWxJsResult
      * @author Zhu Kaixiao
      * @date 2020/8/15 13:49
      */
-    PayWxJsResult payWxJs(IPayDTO payDTO, String openId);
+    PayWxJsResult payWxJs(IPayDTO payDTO);
 
     /**
      * 同步调用支付

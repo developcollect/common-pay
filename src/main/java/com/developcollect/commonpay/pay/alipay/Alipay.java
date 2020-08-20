@@ -8,6 +8,7 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
+import com.developcollect.commonpay.ExtKeys;
 import com.developcollect.commonpay.PayPlatform;
 import com.developcollect.commonpay.config.AliPayConfig;
 import com.developcollect.commonpay.exception.PayException;
@@ -86,7 +87,7 @@ public class Alipay extends AbstractPay {
      * https://opendocs.alipay.com/open/194/106039
      */
     @Override
-    public PayResponse payScan(IPayDTO payDTO, String authCode) {
+    public PayResponse payScan(IPayDTO payDTO) {
         try {
             AliPayConfig aliPayConfig = getPayConfig();
             AlipayClient alipayClient = getAlipayClient(aliPayConfig);
@@ -96,7 +97,7 @@ public class Alipay extends AbstractPay {
 
 
             PayData payData = PayData.of(payDTO);
-            payData.setAuthCode(authCode);
+            payData.setAuthCode(payDTO.getExt(ExtKeys.PAY_SCAN_AUTH_CODE).toString());
             payData.setProductCode("FACE_TO_FACE_PAYMENT");
 
             String param = JSONObject.toJSONString(payData);

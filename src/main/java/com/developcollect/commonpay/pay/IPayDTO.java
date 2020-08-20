@@ -21,7 +21,7 @@ public interface IPayDTO<SOURCE> {
     String getTradeNo();
 
     /**
-     * 获取订单总额
+     * 获取支付金额
      */
     Long getTotalFee();
 

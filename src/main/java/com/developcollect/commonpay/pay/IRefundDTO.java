@@ -9,13 +9,22 @@ package com.developcollect.commonpay.pay;
 public interface IRefundDTO<SOURCE> {
 
     /**
-     * 退款单号
+     * 商户退款单号
      *
      * @return 退款单号
      * @author zak
      * @since 1.0.0
      */
     String getOutRefundNo();
+
+    /**
+     * 支付平台退款单号
+     *
+     * @return 退款单号
+     * @author zak
+     * @since 1.0.0
+     */
+    String getRefundNo();
 
     /**
      * 退款金额 单位：分

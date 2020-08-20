@@ -23,6 +23,11 @@ public class RePayPlatformRefundDTO implements IRefundDTO {
     }
 
     @Override
+    public String getRefundNo() {
+        return refund.getRefundNo();
+    }
+
+    @Override
     public Long getRefundFee() {
         return refund.getRefundFee();
     }

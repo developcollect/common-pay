@@ -19,7 +19,7 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
-    public PayResponse payScan(IPayDTO payDTO, String authCode) {
+    public PayResponse payScan(IPayDTO payDTO) {
         throw new PayException("暂不支持扫用户付款码支付");
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
-    public PayWxJsResult payWxJs(IPayDTO payDTO, String openId) {
+    public PayWxJsResult payWxJs(IPayDTO payDTO) {
         throw new PayException("暂不支持微信JS支付");
     }
 
