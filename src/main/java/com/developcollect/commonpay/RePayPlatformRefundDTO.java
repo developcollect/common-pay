@@ -51,4 +51,8 @@ public class RePayPlatformRefundDTO implements IRefundDTO {
     public void putExt(String key, Object extParameter) {
         refund.putExt(key, extParameter);
     }
+
+    public IRefundDTO getOriginRefundDTO() {
+        return refund;
+    }
 }

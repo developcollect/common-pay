@@ -71,4 +71,8 @@ public class RePayPlatformTransferDTO implements ITransferDTO {
     public void putExt(String key, Object extParameter) {
         transfer.putExt(key, extParameter);
     }
+
+    public ITransferDTO getOriginTransferDTO() {
+        return transfer;
+    }
 }

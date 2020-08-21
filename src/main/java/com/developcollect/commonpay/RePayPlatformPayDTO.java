@@ -62,4 +62,8 @@ public class RePayPlatformPayDTO implements IPayDTO {
     public void putExt(String key, Object extParameter) {
         payDTO.putExt(key, extParameter);
     }
+
+    public IPayDTO getOriginPayDTO() {
+        return payDTO;
+    }
 }
