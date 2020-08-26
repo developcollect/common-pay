@@ -53,6 +53,9 @@ public class PayUtil {
 
     /**
      * 使用订单中的支付平台, 而是用指定的支付平台进行扫用户付款码支付
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -66,6 +69,9 @@ public class PayUtil {
 
     /**
      * 使用订单中的支付平台, 而是用指定的支付平台进行扫用户付款码支付
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO      订单
@@ -93,6 +99,9 @@ public class PayUtil {
 
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台进行app支付
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -125,6 +134,9 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台支付(二维码)
      * 返回的是二维码的文本值, 可根据该文本值生成二维码图片
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -159,6 +171,9 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台支付(二维码)
      * 返回的是一张png格式的二维码图片的base64字符串
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -195,6 +210,10 @@ public class PayUtil {
      * 返回的是二维码图片的访问链接
      * 这个链接是通过配置的链接生成器生成的
      *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
+     *
      * @param payDTO 订单
      * @return java.lang.String  二维码图片的访问链接
      * @author zak
@@ -226,6 +245,10 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台支付(PC页面跳转方式)
      * 返回的是一段html代码
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payDTO 订单
      * @return html代码段
@@ -259,6 +282,10 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台支付(PC页面跳转方式)
      * 返回的是一个页面链接
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -297,6 +324,10 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台支付(WAP页面跳转方式)
      * 返回的是一段html代码
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -338,6 +369,10 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台支付(WAP页面跳转方式)
      * 返回的是一个页面链接
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -385,6 +420,10 @@ public class PayUtil {
      * 不使用订单中的支付平台, 而是用指定的支付平台在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
      * 仅微信支持
      *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
+     *
      * @param payPlatform 支付平台
      * @param payDTO       订单
      * @param openId      微信用户标识
@@ -400,6 +439,10 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
      * 仅微信支持
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO      订单
@@ -436,6 +479,10 @@ public class PayUtil {
      * 不使用订单中的支付平台, 而是用指定的支付平台支付(同步支付)
      * 直接返回支付结果,而不是通过异步通知的形式
      *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
+     *
      * @param payPlatform 支付平台
      * @param payDTO       订单
      * @return 支付结果
@@ -465,6 +512,10 @@ public class PayUtil {
     /**
      * 不使用订单中的支付平台, 而是用指定的支付平台查询订单支付结果
      * 查询出错时返回null
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IPayDTO}可能是{@link RePayPlatformPayDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IPayDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformPayDTO(int, IPayDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO       订单
@@ -507,6 +558,10 @@ public class PayUtil {
     /**
      * 不使用退款对象中的支付平台, 而是用指定的支付平台退款(同步方法)
      * 直接返回退款结果,而不是通过异步通知的形式
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link IRefundDTO}可能是{@link RePayPlatformRefundDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的IRefundDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformRefundDTO(int, IRefundDTO)}
      *
      * @param payPlatform 支付平台
      * @param payDTO      支付参数
@@ -552,6 +607,11 @@ public class PayUtil {
     /**
      * 不使用转账对象中的支付平台, 而是用指定的支付平台转账(同步方法)
      * 直接返回转账结果,而不是通过异步通知的形式
+     *
+     * 注意: 如果额外指定了支付平台, 那么在回调配置的生成器时传入的{@link ITransferDTO}可能是{@link RePayPlatformTransferDTO}类型,
+     *       而不是实际传入的类型, 此时不能直接强转成实际传入的类型;也可能是生成的动态代理, 此时就可直接强转成实际传入的类型
+     *       是否能生成动态代理取决于实际的ITransferDTO的实现类是否有无参构造函数, 具体逻辑见{@link #rePayPlatformTransferDTO(int, ITransferDTO)}
+     *
      *
      * @param payPlatform 支付平台
      * @param transferDTO    转账对象

@@ -46,22 +46,22 @@ PS: APP支付、付款码支付因条件原因未能测试，如有BUG请提issu
 <dependency>
   <groupId>com.developcollect</groupId>
   <artifactId>common-pay</artifactId>
-  <version>1.8.8</version>
+  <version>2.0.1</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```groovy
-implementation 'com.developcollect:common-pay:1.8.8'
+implementation 'com.developcollect:common-pay:2.0.1'
 ```
 
 ##### 非Maven项目
 
 点击以下任一链接，下载`common-pay-X.X.X.jar`即可：
 
-* [Maven中央仓库1](https://repo1.maven.org/maven2/com/developcollect/common-pay/1.8.8/)
-* [Maven中央仓库2](https://repo2.maven.org/maven2/com/developcollect/common-pay/1.8.8/)
+* [Maven中央仓库1](https://repo1.maven.org/maven2/com/developcollect/common-pay/2.0.1/)
+* [Maven中央仓库2](https://repo2.maven.org/maven2/com/developcollect/common-pay/2.0.1/)
 
 > 注意：common-pay仅支持JDK8+
 
