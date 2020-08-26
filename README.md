@@ -72,10 +72,14 @@ implementation 'com.developcollect:common-pay:2.0.1'
 ### 目录结构描述
 
 ```txt
-commonpay
+commonpay                                        
+│  ExtKeys.java                                             // 扩展参数key常量
 │  PayPlatform.java                                         // 支付平台常量
 │  PayUtil.java                                             // 支付工具类(重点)
-│  
+│  RePayPlatformPayDTO.java                                 // 指定支付平台PayDTO
+│  RePayPlatformRefundDTO.java                              // 指定支付平台RefundDTO
+│  RePayPlatformTransferDTO.java                            // 指定支付平台TransferDTO
+│
 ├─config                                                    // 支付相关配置包
 │      AbstractPayConfig.java                               // 通用支付配置
 │      AliPayConfig.java                                    // 支付宝支付配置
@@ -85,7 +89,6 @@ commonpay
 │      WxPayConfig.java                                     // 微信支付配置
 │      
 ├─exception                                                 // 异常包
-│      AbstractSimpleParameterRuntimeException.java         
 │      ConfigException.java                                 // 配置错误异常
 │      PayException.java                                    // 支付流程异常
 │      
@@ -144,8 +147,6 @@ commonpay
 │              WXPayXmlUtil.java
 │              
 └─utils                                                     // 工具包
-    LambdaUtil.java                                         // lambda工具
-    SerializeUtil.java                                      // 序列化工具
     UnitUtil.java                                           // 单位换算工具
 ```
 

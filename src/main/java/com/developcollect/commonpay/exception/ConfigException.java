@@ -1,5 +1,7 @@
 package com.developcollect.commonpay.exception;
 
+import com.developcollect.dcinfra.exception.AbstractSimpleParameterRuntimeException;
+
 /**
  * 配置异常
  * @author zak
