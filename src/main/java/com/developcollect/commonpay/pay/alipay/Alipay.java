@@ -17,7 +17,7 @@ import com.developcollect.commonpay.pay.alipay.bean.PayData;
 import com.developcollect.commonpay.pay.alipay.bean.PayQueryData;
 import com.developcollect.commonpay.pay.alipay.bean.RefundData;
 import com.developcollect.commonpay.pay.alipay.bean.TransferData;
-import com.developcollect.commonpay.utils.SerializeUtil;
+import com.developcollect.dcinfra.utils.SerializeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;

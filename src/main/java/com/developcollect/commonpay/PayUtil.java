@@ -578,6 +578,7 @@ public class PayUtil {
         } catch (Exception e) {
             // 如果创建失败, 则返回RePayPlatformPayDTO, 这时如果在回调时需要强转, 则要通过RePayPlatformPayDTO#getOriginPayDTO()
             // 方法获取原dto, 再强转
+            log.debug("创建payDTO动态代理失败", e);
             return new RePayPlatformPayDTO(payPlatform, payDTO);
         }
     }
@@ -594,6 +595,7 @@ public class PayUtil {
         } catch (Exception e) {
             // 如果创建失败, 则返回RePayPlatformRefundDTO, 这时如果在回调时需要强转, 则要通过RePayPlatformRefundDTO#getOriginPayDTO()
             // 方法获取原dto, 再强转
+            log.debug("创建refundDTO动态代理失败", e);
             return new RePayPlatformRefundDTO(payPlatform, refundDTO);
         }
     }
@@ -610,6 +612,7 @@ public class PayUtil {
         } catch (Exception e) {
             // 如果创建失败, 则返回RePayPlatformTransferDTO, 这时如果在回调时需要强转, 则要通过RePayPlatformTransferDTO#getOriginPayDTO()
             // 方法获取原dto, 再强转
+            log.debug("创建transferDTO动态代理失败", e);
             return new RePayPlatformTransferDTO(payPlatform, transferDTO);
         }
     }
