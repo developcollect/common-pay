@@ -6,7 +6,9 @@ import com.developcollect.commonpay.config.AbstractPayConfig;
 import com.developcollect.commonpay.config.GlobalConfig;
 import com.developcollect.commonpay.exception.PayException;
 import com.developcollect.commonpay.pay.*;
+import com.developcollect.dcinfra.utils.CglibUtil;
 import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * 支付工具类
@@ -69,7 +71,7 @@ public class PayUtil {
      * @param payDTO      订单
      */
     public static PayResponse payScan(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         PayResponse payResponse = payScan(rePayPlatformPayDTO);
         return payResponse;
     }
@@ -97,7 +99,7 @@ public class PayUtil {
      * @return com.developcollect.commonpay.pay.PayAppResult
      */
     public static PayAppResult payApp(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         PayAppResult result = payApp(rePayPlatformPayDTO);
         return result;
     }
@@ -131,7 +133,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static String payQrCode(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payQrCode(rePayPlatformPayDTO);
     }
 
@@ -165,7 +167,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static String payQrCodeBase64(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payQrCodeBase64(rePayPlatformPayDTO);
     }
 
@@ -199,7 +201,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static String payQrCodeAccessUrl(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payQrCodeAccessUrl(rePayPlatformPayDTO);
     }
 
@@ -231,7 +233,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static String payPcForm(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payPcForm(rePayPlatformPayDTO);
     }
 
@@ -265,7 +267,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static String payPcFormAccessUrl(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payPcFormAccessUrl(rePayPlatformPayDTO);
     }
 
@@ -303,7 +305,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static String payWapForm(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payWapForm(rePayPlatformPayDTO);
     }
 
@@ -344,7 +346,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static String payWapFormAccessUrl(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payWapFormAccessUrl(rePayPlatformPayDTO);
     }
 
@@ -406,7 +408,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static PayWxJsResult payWxJs(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payWxJs(rePayPlatformPayDTO);
     }
 
@@ -441,7 +443,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static PayResponse paySync(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return paySync(rePayPlatformPayDTO);
     }
 
@@ -471,7 +473,7 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static PayResponse payQuery(int payPlatform, IPayDTO payDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
         return payQuery(rePayPlatformPayDTO);
     }
 
@@ -514,8 +516,8 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static RefundResponse refundSync(int payPlatform, IPayDTO payDTO, IRefundDTO refundDTO) {
-        RePayPlatformPayDTO rePayPlatformPayDTO = new RePayPlatformPayDTO(payPlatform, payDTO);
-        RePayPlatformRefundDTO rePayPlatformRefundDTO = new RePayPlatformRefundDTO(payPlatform, refundDTO);
+        IPayDTO rePayPlatformPayDTO = rePayPlatformPayDTO(payPlatform, payDTO);
+        IRefundDTO rePayPlatformRefundDTO = rePayPlatformRefundDTO(payPlatform, refundDTO);
         return refundSync(rePayPlatformPayDTO, rePayPlatformRefundDTO);
     }
 
@@ -558,7 +560,57 @@ public class PayUtil {
      * @since 1.8.6
      */
     public static TransferResponse transferSync(int payPlatform, ITransferDTO transferDTO) {
-        RePayPlatformTransferDTO rePayPlatformTransferDTO = new RePayPlatformTransferDTO(payPlatform, transferDTO);
+        ITransferDTO rePayPlatformTransferDTO = rePayPlatformTransferDTO(payPlatform, transferDTO);
         return transferSync(rePayPlatformTransferDTO);
+    }
+
+
+    private static IPayDTO rePayPlatformPayDTO(int payPlatform, IPayDTO payDTO) {
+        try {
+            // 如果能创建动态代理则创建动态代理, 这样创建的dto是原dto的子类, 在强转时不会报错
+            IPayDTO proxy = CglibUtil.proxy(payDTO, (target, method, args, methodProxy) -> {
+                if ("getPayPlatform".equals(method.getName())) {
+                    return payPlatform;
+                }
+                return methodProxy.invokeSuper(target, args);
+            });
+            return proxy;
+        } catch (Exception e) {
+            // 如果创建失败, 则返回RePayPlatformPayDTO, 这时如果在回调时需要强转, 则要通过RePayPlatformPayDTO#getOriginPayDTO()
+            // 方法获取原dto, 再强转
+            return new RePayPlatformPayDTO(payPlatform, payDTO);
+        }
+    }
+
+    private static IRefundDTO rePayPlatformRefundDTO(int payPlatform, IRefundDTO refundDTO) {
+        try {
+            // 如果能创建动态代理则创建动态代理, 这样创建的dto是原dto的子类, 在强转时不会报错
+            return CglibUtil.proxy(refundDTO, (target, method, args, methodProxy) -> {
+                if ("getPayPlatform".equals(method.getName())) {
+                    return payPlatform;
+                }
+                return methodProxy.invokeSuper(target, args);
+            });
+        } catch (Exception e) {
+            // 如果创建失败, 则返回RePayPlatformRefundDTO, 这时如果在回调时需要强转, 则要通过RePayPlatformRefundDTO#getOriginPayDTO()
+            // 方法获取原dto, 再强转
+            return new RePayPlatformRefundDTO(payPlatform, refundDTO);
+        }
+    }
+
+    private static ITransferDTO rePayPlatformTransferDTO(int payPlatform, ITransferDTO transferDTO) {
+        try {
+            // 如果能创建动态代理则创建动态代理, 这样创建的dto是原dto的子类, 在强转时不会报错
+            return CglibUtil.proxy(transferDTO, (target, method, args, methodProxy) -> {
+                if ("getPayPlatform".equals(method.getName())) {
+                    return payPlatform;
+                }
+                return methodProxy.invokeSuper(target, args);
+            });
+        } catch (Exception e) {
+            // 如果创建失败, 则返回RePayPlatformTransferDTO, 这时如果在回调时需要强转, 则要通过RePayPlatformTransferDTO#getOriginPayDTO()
+            // 方法获取原dto, 再强转
+            return new RePayPlatformTransferDTO(payPlatform, transferDTO);
+        }
     }
 }

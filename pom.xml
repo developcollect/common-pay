@@ -44,22 +44,19 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <hutool-all.version>5.3.1</hutool-all.version>
         <lombok.version>1.18.12</lombok.version>
         <alipay-sdk-java.version>4.8.10.ALL</alipay-sdk-java.version>
-        <httpclient.version>4.5.11</httpclient.version>
-        <fastjson.version>1.2.71</fastjson.version>
-        <xstream.version>1.4.10</xstream.version>
-        <spring-boot-starter-web.version>2.3.2.RELEASE</spring-boot-starter-web.version>
         <junit.version>4.12</junit.version>
         <zxing.version>3.3.0</zxing.version>
+        <dc-infra.version>1.0.3</dc-infra.version>
+        <cglib.version>3.3.0</cglib.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool-all.version}</version>
+            <groupId>com.developcollect</groupId>
+            <artifactId>dc-infra</artifactId>
+            <version>${dc-infra.version}</version>
         </dependency>
 
         <dependency>
@@ -92,30 +89,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>${xstream.version}</version>
-        </dependency>
-
-        <!--    <dependency>-->
-        <!--      <groupId>org.springframework.boot</groupId>-->
-        <!--      <artifactId>spring-boot-starter-web</artifactId>-->
-        <!--      <version>${spring-boot-starter-web.version}</version>-->
-        <!--      <scope>provided</scope>-->
-        <!--    </dependency>-->
-
         <!-- 生成二维码 -->
         <dependency>
             <groupId>com.google.zxing</groupId>
@@ -129,23 +102,12 @@
         </dependency>
 
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-to-slf4j</artifactId>
-            <version>2.13.3</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>1.7.30</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
 
