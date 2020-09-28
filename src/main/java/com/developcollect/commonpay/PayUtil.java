@@ -578,6 +578,21 @@ public class PayUtil {
 
 
     /**
+     * 查询退款结果
+     *
+     * @param refundDTO
+     * @return com.developcollect.commonpay.pay.RefundResponse
+     * @author Zhu Kaixiao
+     * @date 2020/9/28 14:45
+     */
+    public static RefundResponse refundQuery(IRefundDTO refundDTO) {
+        Pay pay = GlobalConfig.payFactory().createPay(refundDTO.getPayPlatform());
+        RefundResponse refundResponse = pay.refundQuery(refundDTO);
+        return refundResponse;
+    }
+
+
+    /**
      * 转账(同步方法)
      * 直接返回转账结果,而不是通过异步通知的形式
      *
@@ -622,6 +637,21 @@ public class PayUtil {
     public static TransferResponse transferSync(int payPlatform, ITransferDTO transferDTO) {
         ITransferDTO rePayPlatformTransferDTO = rePayPlatformTransferDTO(payPlatform, transferDTO);
         return transferSync(rePayPlatformTransferDTO);
+    }
+
+
+    /**
+     * 查询转账结果
+     *
+     * @param transferDTO
+     * @return com.developcollect.commonpay.pay.TransferResponse
+     * @author Zhu Kaixiao
+     * @date 2020/9/28 14:44
+     */
+    public static TransferResponse transferQuery(ITransferDTO transferDTO) {
+        Pay pay = GlobalConfig.payFactory().createPay(transferDTO.getPayPlatform());
+        TransferResponse transferResponse = pay.transferQuery(transferDTO);
+        return transferResponse;
     }
 
 
