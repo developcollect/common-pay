@@ -20,5 +20,5 @@ public interface IUnconfirmedOrderFetcher {
      * @author zak
      * @since 1.0.0
      */
-    Page<IPayDTO> getUnconfirmedOrders(Page page);
+    Page<IPayDTO> getUnconfirmedOrders(Page<IPayDTO> page);
 }

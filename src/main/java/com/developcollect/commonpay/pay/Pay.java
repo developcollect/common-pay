@@ -98,6 +98,7 @@ public interface Pay extends Serializable {
      */
     RefundResponse refundSync(IPayDTO payDTO, IRefundDTO refundDTO);
 
+    RefundResponse refundQuery(IRefundDTO transferDTO);
 
     /**
      * 转账
@@ -109,4 +110,6 @@ public interface Pay extends Serializable {
      */
     TransferResponse transferSync(ITransferDTO transferDTO);
 
+
+    TransferResponse transferQuery(ITransferDTO transferDTO);
 }

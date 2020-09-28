@@ -711,4 +711,19 @@ public class WXPay {
         return this.processResponseXml(respXml);
     }
 
+    public Map<String, String> transferQuery(Map<String, String> reqData) throws Exception {
+        return this.transferQuery(reqData, this.config.getHttpConnectTimeoutMs(), this.config.getHttpReadTimeoutMs());
+    }
+
+    public Map<String, String> transferQuery(Map<String, String> reqData, int connectTimeoutMs, int readTimeoutMs) throws Exception {
+        String url;
+        if (this.useSandbox) {
+            url = WXPayConstants.SANDBOX_TRANSFER_QUERY_URL_SUFFIX;
+        } else {
+            url = WXPayConstants.TRANSFER_QUERY_URL_SUFFIX;
+        }
+        String respXml = this.requestWithCert(url, this.fillTransferRequestData(reqData), connectTimeoutMs, readTimeoutMs);
+        return this.processResponseXml(respXml);
+    }
+
 } // end class

@@ -51,6 +51,16 @@ public class GlobalConfig {
     private IUnconfirmedOrderFetcher unconfirmedOrderFetcher;
 
     /**
+     * 未确认提现单提取器
+     */
+    private IUnconfirmedTransferFetcher unconfirmedTransferFetcher;
+
+    /**
+     * 未确认退款单提取器
+     */
+    private IUnconfirmedRefundFetcher unconfirmedRefundFetcher;
+
+    /**
      * 主动查询通知管理器
      */
     private QueryNoticeManager queryNoticeManager = new QueryNoticeManager();
@@ -131,6 +141,30 @@ public class GlobalConfig {
      */
     public static IUnconfirmedOrderFetcher unconfirmedOrderFetcher() {
         return getInstance().getUnconfirmedOrderFetcher();
+    }
+
+
+    /**
+     * 获取当前配置的未确认提现单提取器
+     *
+     * @return 未确认提现单提取器
+     * @author zak
+     * @since 1.0.0
+     */
+    public static IUnconfirmedTransferFetcher unconfirmedTransferFetcher() {
+        return getInstance().getUnconfirmedTransferFetcher();
+    }
+
+
+    /**
+     * 获取当前配置的未确认退款单提取器
+     *
+     * @return 未确认退款单提取器
+     * @author zak
+     * @since 1.0.0
+     */
+    public static IUnconfirmedRefundFetcher unconfirmedRefundFetcher() {
+        return getInstance().getUnconfirmedRefundFetcher();
     }
 
     /**

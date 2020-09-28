@@ -1,6 +1,5 @@
 package com.developcollect.commonpay.pay.wxpay;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -12,6 +11,7 @@ import com.developcollect.commonpay.pay.*;
 import com.developcollect.commonpay.pay.wxpay.sdk.WXPay;
 import com.developcollect.commonpay.pay.wxpay.sdk.WXPayConstants;
 import com.developcollect.commonpay.pay.wxpay.sdk.WXPayUtil;
+import com.developcollect.dcinfra.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
@@ -151,7 +151,7 @@ public class WxPay extends AbstractPay {
 
 
             PayResponse payResponse = new PayResponse();
-            payResponse.setPayPlatform(PayPlatform.WX_PAY);
+            payResponse.setPayPlatform(getPlatform());
             payResponse.setSuccess("SUCCESS".equals(map.get("result_code")));
             payResponse.setErrCode(map.get("err_code"));
             payResponse.setErrCodeDes(map.get("err_code_des"));
@@ -331,7 +331,7 @@ public class WxPay extends AbstractPay {
             payResponse.setSuccess("SUCCESS".equals(map.get("trade_state")));
             payResponse.setTradeNo(map.get("transaction_id"));
             payResponse.setOutTradeNo(map.get("out_trade_no"));
-            payResponse.setPayPlatform(PayPlatform.WX_PAY);
+            payResponse.setPayPlatform(getPlatform());
             payResponse.setPayTime(DateUtil.parseLocalDateTime(map.get("time_end"), "yyyyMMddHHmmss"));
             payResponse.setRawObj((Serializable) map);
             return payResponse;
@@ -347,6 +347,16 @@ public class WxPay extends AbstractPay {
         return reqData;
     }
 
+    /**
+     * 退款
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_4
+     *
+     * @param payDTO
+     * @param refundDTO
+     * @return com.developcollect.commonpay.pay.RefundResponse
+     * @author Zhu Kaixiao
+     * @date 2020/9/28 13:37
+     */
     @Override
     public RefundResponse refundSync(IPayDTO payDTO, IRefundDTO refundDTO) {
         try {
@@ -374,8 +384,9 @@ public class WxPay extends AbstractPay {
             RefundResponse refundResponse = new RefundResponse();
             refundResponse.setRefundNo(map.get("refund_id"));
             refundResponse.setOutRefundNo(map.get("out_refund_no"));
-            refundResponse.setPayPlatform(PayPlatform.WX_PAY);
-            refundResponse.setSuccess(true);
+            refundResponse.setPayPlatform(getPlatform());
+            // 微信退款需要查询状态
+            refundResponse.setStatus(RefundResponse.PROCESSING);
             refundResponse.setRawObj((Serializable) map);
             return refundResponse;
         } catch (Throwable throwable) {
@@ -386,6 +397,59 @@ public class WxPay extends AbstractPay {
         }
     }
 
+
+    @Override
+    public RefundResponse refundQuery(IRefundDTO refundDTO) {
+        try {
+            WxPayConfig wxPayConfig = getPayConfig();
+            WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
+
+            Map<String, String> paramMap = new HashMap<>();
+            paramMap.put("out_refund_no", refundDTO.getOutRefundNo());
+            paramMap.put("refund_id", refundDTO.getRefundNo());
+            Map<String, String> resultMap = wxSdkPay.refundQuery(paramMap);
+            if (!"SUCCESS".equals(resultMap.get("return_code"))) {
+                throw new PayException("微信退款查询接口调用失败：{}", resultMap.get("return_msg"));
+            }
+
+
+            RefundResponse refundResponse = new RefundResponse();
+            refundResponse.setPayPlatform(getPlatform());
+
+            // 确认当前查询的退款的下标
+            int refundIdx;
+            int refundCount = Integer.parseInt(resultMap.get("refund_count"));
+            for (refundIdx = 0; refundIdx < refundCount; refundIdx++) {
+                if (refundDTO.getOutRefundNo().equals(resultMap.get("out_refund_no_" + refundIdx))) {
+                    resultMap.put("refundIndex", String.valueOf(refundIdx));
+                    break;
+                }
+            }
+
+
+            refundResponse.setRefundNo(resultMap.get("refund_id_" + refundIdx));
+            refundResponse.setOutRefundNo(resultMap.get("out_refund_no_" + refundIdx));
+            refundResponse.setRawObj((Serializable) resultMap);
+
+            String refundStatus = resultMap.get("refund_status_" + refundIdx);
+            if ("SUCCESS".equals(refundStatus)) {
+                refundResponse.setStatus(RefundResponse.SUCCESS);
+                refundResponse.setRefundTime(com.developcollect.dcinfra.utils.DateUtil.parseLocalDateTime(resultMap.get("refund_success_time_" + refundIdx), "yyyy-MM-dd HH:mm:ss"));
+            } else if ("PROCESSING".equals(refundStatus)) {
+                refundResponse.setStatus(RefundResponse.PROCESSING);
+            } else {
+                refundResponse.setStatus(RefundResponse.FAIL);
+            }
+
+
+            return refundResponse;
+        } catch (Throwable throwable) {
+            log.error("微信退款状态查询失败");
+            throw throwable instanceof PayException
+                    ? (PayException) throwable
+                    : new PayException("微信退款状态查询失败", throwable);
+        }
+    }
 
     /**
      * 微信转账
@@ -412,14 +476,20 @@ public class WxPay extends AbstractPay {
                 throw new PayException(map.get("return_msg"));
             }
             TransferResponse transferResponse = new TransferResponse();
+            transferResponse.setRawObj((Serializable) map);
+            transferResponse.setPayPlatform(getPlatform());
+
+
             if ("FAIL".equals(map.get("result_code"))) {
+                transferResponse.setOutTransferNo(transferDTO.getOutTransferNo());
                 transferResponse.setErrorCode(map.get("err_code"));
                 transferResponse.setErrorDesc(map.get("err_code_des"));
-                transferResponse.setStatus(TransferResponse.STATUS_FAIL);
+                transferResponse.setStatus(TransferResponse.PROCESSING);
             } else {
                 transferResponse.setTransferNo(map.get("payment_no"));
                 transferResponse.setPaymentTime(DateUtil.parseLocalDateTime(map.get("payment_time")));
-                transferResponse.setStatus(TransferResponse.STATUS_SUCCESS);
+                transferResponse.setOutTransferNo(map.get("partner_trade_no"));
+                transferResponse.setStatus(TransferResponse.SUCCESS);
             }
             return transferResponse;
         } catch (Throwable throwable) {
@@ -429,6 +499,55 @@ public class WxPay extends AbstractPay {
                     : new PayException("微信转账失败", throwable);
         }
 
+    }
+
+
+    @Override
+    public TransferResponse transferQuery(ITransferDTO transferDTO) {
+        try {
+            WxPayConfig wxPayConfig = getPayConfig();
+            WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
+
+            Map<String, String> reqData = new HashMap<>();
+            reqData.put("partner_trade_no", transferDTO.getOutTransferNo());
+
+            Map<String, String> resultMap = wxSdkPay.transferQuery(reqData);
+
+            if ("FAIL".equals(resultMap.get("return_code"))) {
+                throw new PayException("微信查询企业付款失败: {}", resultMap.get("return_msg"));
+            }
+
+
+            TransferResponse transferResponse = new TransferResponse();
+            transferResponse.setRawObj((Serializable) resultMap);
+            transferResponse.setPayPlatform(getPlatform());
+
+            if ("FAIL".equals(resultMap.get("result_code"))) {
+                transferResponse.setOutTransferNo(transferDTO.getOutTransferNo());
+                transferResponse.setErrorCode(resultMap.get("err_code"));
+                transferResponse.setErrorDesc(resultMap.get("err_code_des"));
+                transferResponse.setStatus(TransferResponse.PROCESSING);
+            } else {
+                transferResponse.setTransferNo(resultMap.get("detail_id"));
+                transferResponse.setPaymentTime(DateUtil.parseLocalDateTime(resultMap.get("payment_time")));
+                transferResponse.setOutTransferNo(resultMap.get("partner_trade_no"));
+                if ("SUCCESS".equals(resultMap.get("status"))) {
+                    transferResponse.setStatus(TransferResponse.SUCCESS);
+                } else if ("PROCESSING".equals(resultMap.get("status"))) {
+                    transferResponse.setStatus(TransferResponse.PROCESSING);
+                } else {
+                    transferResponse.setStatus(TransferResponse.FAIL);
+                    transferResponse.setErrorDesc(resultMap.get("reason"));
+                }
+
+            }
+            return transferResponse;
+        } catch (Throwable throwable) {
+            log.error("微信查询企业付款失败", throwable);
+            throw throwable instanceof PayException
+                    ? (PayException) throwable
+                    : new PayException("微信查询企业付款失败", throwable);
+        }
     }
 
     @Override

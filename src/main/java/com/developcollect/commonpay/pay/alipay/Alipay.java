@@ -1,6 +1,5 @@
 package com.developcollect.commonpay.pay.alipay;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
@@ -17,10 +16,13 @@ import com.developcollect.commonpay.pay.alipay.bean.PayData;
 import com.developcollect.commonpay.pay.alipay.bean.PayQueryData;
 import com.developcollect.commonpay.pay.alipay.bean.RefundData;
 import com.developcollect.commonpay.pay.alipay.bean.TransferData;
+import com.developcollect.dcinfra.utils.DateUtil;
 import com.developcollect.dcinfra.utils.SerializeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -307,10 +309,12 @@ public class Alipay extends AbstractPay {
 
             RefundResponse refundResponse = new RefundResponse();
             refundResponse.setRefundNo(alipayTradeRefundResponse.getTradeNo());
-            refundResponse.setSuccess(true);
+            // 支付宝退款文档中没看到返回结果中有退款是否成功的字段，所以固定就是处理中
+            refundResponse.setStatus(RefundResponse.PROCESSING);
             refundResponse.setRawObj(alipayTradeRefundResponse);
-            refundResponse.setPayPlatform(PayPlatform.ALI_PAY);
+            refundResponse.setPayPlatform(getPlatform());
             refundResponse.setOutRefundNo(refundDTO.getOutRefundNo());
+            refundResponse.setRefundTime(DateUtil.localDateTime(alipayTradeRefundResponse.getGmtRefundPay()));
             return refundResponse;
         } catch (Throwable throwable) {
             log.error("支付宝退款失败");
@@ -318,6 +322,60 @@ public class Alipay extends AbstractPay {
                     ? (PayException) throwable
                     : new PayException("支付宝退款失败", throwable);
         }
+    }
+
+    /**
+     * 支付宝退款查询
+     * https://opendocs.alipay.com/apis/api_1/alipay.trade.fastpay.refund.query
+     *
+     * @param refundDTO
+     * @return com.developcollect.commonpay.pay.RefundResponse
+     * @author Zhu Kaixiao
+     * @date 2020/9/28 12:50
+     */
+    @Override
+    public RefundResponse refundQuery(IRefundDTO refundDTO) {
+        try {
+            AliPayConfig aliPayConfig = getPayConfig();
+            AlipayClient alipayClient = getAlipayClient(aliPayConfig);
+
+            AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
+
+            // 退款查询参数
+            Map<String, String> paramMap = new HashMap<>(2);
+            // 商户退款单号
+            paramMap.put("out_trade_no", refundDTO.getOutRefundNo());
+            paramMap.put("out_request_no", refundDTO.getOutRefundNo());
+            // 支付宝退款单号
+            paramMap.put("trade_no", refundDTO.getRefundNo());
+
+            request.setBizContent(JSONObject.toJSONString(paramMap));
+            AlipayTradeFastpayRefundQueryResponse response = alipayClient.execute(request);
+            if (!response.isSuccess()) {
+                log.debug("支付宝退款查询调用失败");
+                throw new PayException("支付宝退款查询调用失败: " + response.getMsg());
+            }
+
+            RefundResponse refundResponse = new RefundResponse();
+            refundResponse.setRawObj(response);
+            refundResponse.setRefundNo(response.getTradeNo());
+            if ("REFUND_SUCCESS".equals(response.getRefundStatus())) {
+                refundResponse.setStatus(RefundResponse.SUCCESS);
+            } else {
+                refundResponse.setStatus(RefundResponse.PROCESSING);
+            }
+            refundResponse.setPayPlatform(getPlatform());
+            refundResponse.setOutRefundNo(refundDTO.getOutRefundNo());
+            //退款时间； 默认不返回该信息，需与支付宝约定后配置返回；
+
+            if (response.getGmtRefundPay() != null) {
+                refundResponse.setRefundTime(DateUtil.localDateTime(response.getGmtRefundPay()));
+            }
+            return refundResponse;
+        } catch (AlipayApiException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -339,6 +397,9 @@ public class Alipay extends AbstractPay {
             }
             TransferResponse transferResponse = new TransferResponse();
             transferResponse.setTransferNo(response.getOrderId());
+            transferResponse.setOutTransferNo(response.getOutBizNo());
+            transferResponse.setPayPlatform(getPlatform());
+            transferResponse.setRawObj(response);
 
             // 文档上说TransDate是必定会返回的, 但是用沙箱时会为null,  当为null时取当前时间
             LocalDateTime transDate = Optional.of(response)
@@ -348,13 +409,14 @@ public class Alipay extends AbstractPay {
 
             transferResponse.setPaymentTime(transDate);
             if ("SUCCESS".equals(response.getStatus())) {
-                transferResponse.setStatus(TransferResponse.STATUS_SUCCESS);
-            } else if ("DEALING".equals(response.getStatus())) {
-                transferResponse.setStatus(TransferResponse.STATUS_PROCESSING);
+                transferResponse.setStatus(TransferResponse.SUCCESS);
             } else if ("FAIL".equals(response.getStatus())) {
-                transferResponse.setStatus(TransferResponse.STATUS_FAIL);
+                transferResponse.setStatus(TransferResponse.FAIL);
                 transferResponse.setErrorCode(response.getSubCode());
                 transferResponse.setErrorDesc(response.getSubMsg());
+            } else {
+                // DEALING, INIT, UNKNOWN, 状态都认为是在处理中
+                transferResponse.setStatus(TransferResponse.PROCESSING);
             }
             return transferResponse;
         } catch (Throwable throwable) {
@@ -362,6 +424,61 @@ public class Alipay extends AbstractPay {
             throw (throwable instanceof PayException)
                     ? (PayException) throwable
                     : new PayException("支付宝转账失败", throwable);
+        }
+    }
+
+
+    @Override
+    public TransferResponse transferQuery(ITransferDTO transferDTO) {
+        try {
+            AliPayConfig aliPayConfig = getPayConfig();
+            AlipayClient alipayClient = getAlipayClient(aliPayConfig);
+
+            AlipayFundTransOrderQueryRequest request = new AlipayFundTransOrderQueryRequest();
+
+            // 转账查询参数， 下面两个单号不能同时为空，如果都有，那么支付宝以‘order_id’为准
+            Map<String, String> paramMap = new HashMap<>(2);
+            // 商户退款单号
+            paramMap.put("out_biz_no", transferDTO.getOutTransferNo());
+            // 支付宝退款单号
+            paramMap.put("order_id", transferDTO.getTransferNo());
+
+            request.setBizContent(JSONObject.toJSONString(paramMap));
+            AlipayFundTransOrderQueryResponse response = alipayClient.execute(request);
+            if (!response.isSuccess()) {
+                log.debug("支付宝转账查询调用失败");
+                throw new PayException("支付宝转账查询调用失败: " + response.getMsg());
+            }
+
+            TransferResponse transferResponse = new TransferResponse();
+            transferResponse.setTransferNo(response.getOrderId());
+            transferResponse.setOutTransferNo(response.getOutBizNo());
+            transferResponse.setPayPlatform(getPlatform());
+            transferResponse.setRawObj(response);
+
+            LocalDateTime transDate = Optional.of(response)
+                    .map(AlipayFundTransOrderQueryResponse::getPayDate)
+                    .map(DateUtil::parseLocalDateTime)
+                    .orElse(LocalDateTime.now());
+
+            transferResponse.setPaymentTime(transDate);
+            if ("SUCCESS".equals(response.getStatus())) {
+                transferResponse.setStatus(TransferResponse.SUCCESS);
+            } else if ("FAIL".equals(response.getStatus())) {
+                transferResponse.setStatus(TransferResponse.FAIL);
+                transferResponse.setErrorCode(response.getSubCode());
+                transferResponse.setErrorDesc(response.getSubMsg());
+            } else {
+                // DEALING, INIT, UNKNOWN, 状态都认为是在处理中
+                transferResponse.setStatus(TransferResponse.PROCESSING);
+            }
+
+            return transferResponse;
+        } catch (Throwable throwable) {
+            log.error("支付宝查询转账失败");
+            throw (throwable instanceof PayException)
+                    ? (PayException) throwable
+                    : new PayException("支付宝查询转账失败", throwable);
         }
     }
 
@@ -379,6 +496,8 @@ public class Alipay extends AbstractPay {
 
         return alipayClient;
     }
+
+
 
 
     @Override

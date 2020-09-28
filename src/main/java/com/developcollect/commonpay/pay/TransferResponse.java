@@ -21,17 +21,17 @@ public class TransferResponse implements Serializable {
     /**
      * 成功
      */
-    public static final int STATUS_SUCCESS = 1;
+    public static final int SUCCESS = 1;
 
     /**
      * 处理中
      */
-    public static final int STATUS_PROCESSING = 2;
+    public static final int PROCESSING = 2;
 
     /**
      * 失败
      */
-    public static final int STATUS_FAIL = 3;
+    public static final int FAIL = 3;
 
     /**
      * 支付平台
@@ -78,4 +78,13 @@ public class TransferResponse implements Serializable {
      * 不能只靠payPlatform值来区分是什么对象
      */
     private Serializable rawObj;
+
+
+    /**
+     * 是否转账成功
+     * 注意： 如果返回false则有可能还在转账中
+     */
+    public boolean success() {
+        return status == SUCCESS;
+    }
 }

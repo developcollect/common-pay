@@ -64,7 +64,17 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
+    public RefundResponse refundQuery(IRefundDTO refundDTO) {
+        throw new PayException("暂不查询退款状态");
+    }
+
+    @Override
     public TransferResponse transferSync(ITransferDTO transferDTO) {
         throw new PayException("暂不支持转账");
+    }
+
+    @Override
+    public TransferResponse transferQuery(ITransferDTO transferDTO) {
+        throw new PayException("暂不查询转账状态");
     }
 }

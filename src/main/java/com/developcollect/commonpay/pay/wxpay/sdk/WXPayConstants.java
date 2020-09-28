@@ -59,5 +59,8 @@ public class WXPayConstants {
     // 自己扩展
     public static final String TRANSFER_URL_SUFFIX = "/mmpaymkttransfers/promotion/transfers";
     public static final String SANDBOX_TRANSFER_URL_SUFFIX = "/sandboxnew/mmpaymkttransfers/promotion/transfers";
+
+    public static final String TRANSFER_QUERY_URL_SUFFIX = "/mmpaymkttransfers/gettransferinfo";
+    public static final String SANDBOX_TRANSFER_QUERY_URL_SUFFIX = "/sandboxnew/mmpaymkttransfers/gettransferinfo";
 }
 
