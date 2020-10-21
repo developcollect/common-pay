@@ -146,7 +146,7 @@ public class Alipay extends AbstractPay {
             //如code为10000，需要再次判断subCode是否为空，
             //为空情况下，则表示支付宝业务处理成功，否则表示业务处理失败，详细原因以subMsg属性返回
             if (!SUCCESS_CODE.equals(response.getCode()) || StrUtil.isNotBlank(response.getSubCode())) {
-                throw new PayException(response.getSubMsg());
+                throw new PayException(response.getSubCode(), response);
             }
 
             // 当前预下单请求生成的二维码码串，可以用二维码生成工具根据该码串值生成对应的二维码
@@ -276,7 +276,7 @@ public class Alipay extends AbstractPay {
 
             AlipayTradeQueryResponse response = alipayClient.execute(request);
             if (!response.isSuccess()) {
-                throw new PayException(response.getSubMsg());
+                throw new PayException(response.getSubCode(), response);
             }
 
             PayResponse payResponse = PayResponse.of(response);
@@ -304,7 +304,7 @@ public class Alipay extends AbstractPay {
 
             AlipayTradeRefundResponse alipayTradeRefundResponse = alipayClient.execute(refundRequest);
             if (!alipayTradeRefundResponse.isSuccess()) {
-                throw new PayException(alipayTradeRefundResponse.getSubMsg());
+                throw new PayException(alipayTradeRefundResponse.getSubCode(), alipayTradeRefundResponse);
             }
 
             RefundResponse refundResponse = new RefundResponse();
@@ -353,7 +353,7 @@ public class Alipay extends AbstractPay {
             AlipayTradeFastpayRefundQueryResponse response = alipayClient.execute(request);
             if (!response.isSuccess()) {
                 log.debug("支付宝退款查询调用失败");
-                throw new PayException("支付宝退款查询调用失败: " + response.getMsg());
+                throw new PayException(response.getSubCode(), response);
             }
 
             RefundResponse refundResponse = new RefundResponse();
@@ -393,7 +393,7 @@ public class Alipay extends AbstractPay {
             transferRequest.setBizContent(param);
             AlipayFundTransUniTransferResponse response = alipayClient.execute(transferRequest);
             if (!response.isSuccess()) {
-                throw new PayException(response.getSubMsg());
+                throw new PayException(response.getSubCode(), response);
             }
             TransferResponse transferResponse = new TransferResponse();
             transferResponse.setTransferNo(response.getOrderId());
@@ -447,7 +447,7 @@ public class Alipay extends AbstractPay {
             AlipayFundTransOrderQueryResponse response = alipayClient.execute(request);
             if (!response.isSuccess()) {
                 log.debug("支付宝转账查询调用失败");
-                throw new PayException("支付宝转账查询调用失败: " + response.getMsg());
+                throw new PayException(response.getSubCode(), response);
             }
 
             TransferResponse transferResponse = new TransferResponse();

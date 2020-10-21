@@ -129,10 +129,10 @@ public class WxPay extends AbstractPay {
         Map<String, String> map = wxSdkPay.unifiedOrder(reqData);
 
         if ("FAIL".equals(map.get("return_code"))) {
-            throw new PayException(map.get("return_msg"));
+            throw new PayException(map.get("return_msg"), map);
         }
         if ("FAIL".equals(map.get("result_code"))) {
-            throw new PayException(map.get("err_code_des"));
+            throw new PayException(map.get("err_code_des"), map);
         }
         return map;
     }
@@ -146,7 +146,7 @@ public class WxPay extends AbstractPay {
             reqData.put("auth_code", payDTO.getExt(ExtKeys.PAY_SCAN_AUTH_CODE).toString());
             Map<String, String> map = wxSdkPay.microPay(reqData);
             if ("FAIL".equals(map.get("return_code"))) {
-                throw new PayException(map.get("return_msg"));
+                throw new PayException(map.get("return_msg"), map);
             }
 
 
@@ -321,10 +321,10 @@ public class WxPay extends AbstractPay {
             Map<String, String> map = wxSdkPay.orderQuery(reqData);
 
             if ("FAIL".equals(map.get("return_code"))) {
-                throw new PayException(map.get("return_msg"));
+                throw new PayException(map.get("return_msg"), map);
             }
             if ("FAIL".equals(map.get("result_code"))) {
-                throw new PayException(map.get("err_code_des"));
+                throw new PayException(map.get("err_code_des"), map);
             }
             // --
             PayResponse payResponse = new PayResponse();
@@ -376,10 +376,10 @@ public class WxPay extends AbstractPay {
 
             Map<String, String> map = wxSdkPay.refund(reqData);
             if ("FAIL".equals(map.get("return_code"))) {
-                throw new PayException(map.get("return_msg"));
+                throw new PayException(map.get("return_msg"), map);
             }
             if ("FAIL".equals(map.get("result_code"))) {
-                throw new PayException(map.get("err_code_des"));
+                throw new PayException(map.get("err_code_des"), map);
             }
             RefundResponse refundResponse = new RefundResponse();
             refundResponse.setRefundNo(map.get("refund_id"));
@@ -409,7 +409,7 @@ public class WxPay extends AbstractPay {
             paramMap.put("refund_id", refundDTO.getRefundNo());
             Map<String, String> resultMap = wxSdkPay.refundQuery(paramMap);
             if (!"SUCCESS".equals(resultMap.get("return_code"))) {
-                throw new PayException("微信退款查询接口调用失败：{}", resultMap.get("return_msg"));
+                throw new PayException("微信退款查询接口调用失败：" + resultMap.get("return_msg"), resultMap);
             }
 
 
@@ -473,7 +473,7 @@ public class WxPay extends AbstractPay {
 
             Map<String, String> map = wxSdkPay.transfer(reqData);
             if ("FAIL".equals(map.get("return_code"))) {
-                throw new PayException(map.get("return_msg"));
+                throw new PayException(map.get("return_msg"), map);
             }
             TransferResponse transferResponse = new TransferResponse();
             transferResponse.setRawObj((Serializable) map);
@@ -514,7 +514,7 @@ public class WxPay extends AbstractPay {
             Map<String, String> resultMap = wxSdkPay.transferQuery(reqData);
 
             if ("FAIL".equals(resultMap.get("return_code"))) {
-                throw new PayException("微信查询企业付款失败: {}", resultMap.get("return_msg"));
+                throw new PayException("微信查询企业付款失败: " + resultMap.get("return_msg"), resultMap);
             }
 
 

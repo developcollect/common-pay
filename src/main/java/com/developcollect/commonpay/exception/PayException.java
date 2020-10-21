@@ -1,13 +1,19 @@
 package com.developcollect.commonpay.exception;
 
-import com.developcollect.dcinfra.exception.AbstractSimpleParameterRuntimeException;
+import lombok.Getter;
 
 /**
  * 支付异常
  * @author zak
  * @since 1.0.0
  */
-public class PayException extends AbstractSimpleParameterRuntimeException {
+public class PayException extends RuntimeException {
+
+    /**
+     * 附加信息
+     */
+    @Getter
+    private Object data;
 
     public PayException() {
         super();
@@ -15,6 +21,11 @@ public class PayException extends AbstractSimpleParameterRuntimeException {
 
     public PayException(String message) {
         super(message);
+    }
+
+    public PayException(String message, Object data) {
+        super(message);
+        this.data = data;
     }
 
     public PayException(String message, Throwable cause) {
@@ -25,8 +36,5 @@ public class PayException extends AbstractSimpleParameterRuntimeException {
         super(cause);
     }
 
-    public PayException(String format, Object... params) {
-        super(format, params);
-    }
 
 }
