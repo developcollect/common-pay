@@ -256,13 +256,15 @@ public class WxPay extends AbstractPay {
 
             Map<String, String> wxJsPayMap = new HashMap<>(8);
             wxJsPayMap.put("package", "prepay_id=" + prepayId);
-            wxJsPayMap.put("appid", wxPayConfig.getAppId());
-            wxJsPayMap.put("nonce_str", WXPayUtil.generateNonceStr());
+            // 这里是深坑，微信js支付时有两次签名，第一次在统一下单处，然后用统一下单的返回的prepay_id再做一次签名
+            // 这两次签名的参数名风格不同，前面的是下滑线风格，这里是驼峰风格，这里的appId的I要大写
+            wxJsPayMap.put("appId", wxPayConfig.getAppId());
+            wxJsPayMap.put("nonceStr", WXPayUtil.generateNonceStr());
             wxJsPayMap.put("timeStamp", String.valueOf((System.currentTimeMillis() / 1000)));
-            wxJsPayMap.put("sign_type", wxPayConfig.isDebug() ? WXPayConstants.MD5 : WXPayConstants.HMACSHA256);
+            wxJsPayMap.put("signType", wxPayConfig.isDebug() ? WXPayConstants.MD5 : WXPayConstants.HMACSHA256);
             wxJsPayMap.put("sign", WXPayUtil.generateSignature(wxJsPayMap, wxPayConfig.getKey(),
                     wxPayConfig.isDebug() ? WXPayConstants.SignType.MD5 : WXPayConstants.SignType.HMACSHA256));
-            wxJsPayMap.put("prepay_id", prepayId);
+            wxJsPayMap.put("prepayId", prepayId);
 
             PayWxJsResult payWxJsResult = PayWxJsResult.of(wxJsPayMap);
             return payWxJsResult;

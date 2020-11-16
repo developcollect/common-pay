@@ -57,12 +57,12 @@ public class PayWxJsResult implements Serializable {
 
     public static PayWxJsResult of(Map<String, String> wxJsPayMap) {
         PayWxJsResult wxJsPayResult = new PayWxJsResult();
-        wxJsPayResult.setAppId(wxJsPayMap.get("appid"));
+        wxJsPayResult.setAppId(wxJsPayMap.get("appId"));
         wxJsPayResult.setTimeStamp(wxJsPayMap.get("timeStamp"));
-        wxJsPayResult.setNonceStr(wxJsPayMap.get("nonce_str"));
+        wxJsPayResult.setNonceStr(wxJsPayMap.get("nonceStr"));
         wxJsPayResult.setPackage0(wxJsPayMap.get("package"));
-        wxJsPayResult.setPrepayId(wxJsPayMap.get("prepay_id"));
-        wxJsPayResult.setSignType(wxJsPayMap.get("sign_type"));
+        wxJsPayResult.setPrepayId(wxJsPayMap.get("prepayId"));
+        wxJsPayResult.setSignType(wxJsPayMap.get("signType"));
         wxJsPayResult.setPaySign(wxJsPayMap.get("sign"));
 
         return wxJsPayResult;
