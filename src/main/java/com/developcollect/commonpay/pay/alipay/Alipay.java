@@ -19,6 +19,7 @@ import com.developcollect.commonpay.pay.alipay.bean.TransferData;
 import com.developcollect.dcinfra.utils.DateUtil;
 import com.developcollect.dcinfra.utils.SerializeUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -344,10 +345,15 @@ public class Alipay extends AbstractPay {
             // 退款查询参数
             Map<String, String> paramMap = new HashMap<>(2);
             // 商户退款单号
-            paramMap.put("out_trade_no", refundDTO.getOutRefundNo());
+
+            // 支付宝订单号
+            if (StringUtils.isNotBlank(refundDTO.getRefundNo())) {
+                paramMap.put("trade_no", refundDTO.getRefundNo());
+            }
+            if (StringUtils.isNotBlank(refundDTO.getOutRefundNo())) {
+                paramMap.put("out_trade_no", refundDTO.getOutRefundNo());
+            }
             paramMap.put("out_request_no", refundDTO.getOutRefundNo());
-            // 支付宝退款单号
-            paramMap.put("trade_no", refundDTO.getRefundNo());
 
             request.setBizContent(JSONObject.toJSONString(paramMap));
             AlipayTradeFastpayRefundQueryResponse response = alipayClient.execute(request);

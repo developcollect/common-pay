@@ -13,6 +13,7 @@ import com.developcollect.commonpay.pay.wxpay.sdk.WXPayConstants;
 import com.developcollect.commonpay.pay.wxpay.sdk.WXPayUtil;
 import com.developcollect.dcinfra.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -400,6 +401,15 @@ public class WxPay extends AbstractPay {
     }
 
 
+    /**
+     * 查询退款结果
+     * https://pay.weixin.qq.com/wiki/doc/api/native.php?chapter=9_5
+     *
+     * @param refundDTO
+     * @return com.developcollect.commonpay.pay.RefundResponse
+     * @author Zhu Kaixiao
+     * @date 2020/12/3 15:55
+     */
     @Override
     public RefundResponse refundQuery(IRefundDTO refundDTO) {
         try {
@@ -407,13 +417,16 @@ public class WxPay extends AbstractPay {
             WXPay wxSdkPay = getWxSdkPay(wxPayConfig);
 
             Map<String, String> paramMap = new HashMap<>();
-            paramMap.put("out_refund_no", refundDTO.getOutRefundNo());
-            paramMap.put("refund_id", refundDTO.getRefundNo());
+            if (StringUtils.isNotBlank(refundDTO.getOutRefundNo())) {
+                paramMap.put("out_refund_no", refundDTO.getOutRefundNo());
+            }
+            if (StringUtils.isNotBlank(refundDTO.getRefundNo())) {
+                paramMap.put("refund_id", refundDTO.getRefundNo());
+            }
             Map<String, String> resultMap = wxSdkPay.refundQuery(paramMap);
             if (!"SUCCESS".equals(resultMap.get("return_code"))) {
                 throw new PayException("微信退款查询接口调用失败：" + resultMap.get("return_msg"), resultMap);
             }
-
 
             RefundResponse refundResponse = new RefundResponse();
             refundResponse.setPayPlatform(getPlatform());
