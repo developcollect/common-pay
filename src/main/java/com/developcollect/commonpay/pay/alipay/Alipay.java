@@ -309,7 +309,7 @@ public class Alipay extends AbstractPay {
             }
 
             RefundResponse refundResponse = new RefundResponse();
-            refundResponse.setRefundNo(alipayTradeRefundResponse.getTradeNo());
+            refundResponse.setRefundNo(alipayTradeRefundResponse.getTradeNo() + ":" + refundDTO.getOutRefundNo());
             // 支付宝退款文档中没看到返回结果中有退款是否成功的字段，所以固定就是处理中
             refundResponse.setStatus(RefundResponse.PROCESSING);
             refundResponse.setRawObj(alipayTradeRefundResponse);
@@ -347,11 +347,14 @@ public class Alipay extends AbstractPay {
             // 商户退款单号
 
             // 支付宝订单号
-            if (StringUtils.isNotBlank(refundDTO.getRefundNo())) {
-                paramMap.put("trade_no", refundDTO.getRefundNo());
+            if (StringUtils.isNotBlank(refundDTO.getTradeNo())) {
+                paramMap.put("trade_no", refundDTO.getTradeNo());
             }
-            if (StringUtils.isNotBlank(refundDTO.getOutRefundNo())) {
-                paramMap.put("out_trade_no", refundDTO.getOutRefundNo());
+            if (StringUtils.isNotBlank(refundDTO.getOutTradeNo())) {
+                paramMap.put("out_trade_no", refundDTO.getOutTradeNo());
+            }
+            if (!paramMap.containsKey("trade_no") && !paramMap.containsKey("out_trade_no")) {
+                throw new PayException("支付宝查询退款结果时，支付宝订单号和商户订单号不能同时为空！");
             }
             paramMap.put("out_request_no", refundDTO.getOutRefundNo());
 
@@ -364,16 +367,15 @@ public class Alipay extends AbstractPay {
 
             RefundResponse refundResponse = new RefundResponse();
             refundResponse.setRawObj(response);
-            refundResponse.setRefundNo(response.getTradeNo());
-            if ("REFUND_SUCCESS".equals(response.getRefundStatus())) {
+            refundResponse.setRefundNo(response.getTradeNo() + ":" + refundDTO.getOutRefundNo());
+            if (StringUtils.isNotBlank(response.getRefundAmount()) || "REFUND_SUCCESS".equals(response.getRefundStatus())) {
                 refundResponse.setStatus(RefundResponse.SUCCESS);
             } else {
-                refundResponse.setStatus(RefundResponse.PROCESSING);
+                refundResponse.setStatus(RefundResponse.FAIL);
             }
             refundResponse.setPayPlatform(getPlatform());
             refundResponse.setOutRefundNo(refundDTO.getOutRefundNo());
             //退款时间； 默认不返回该信息，需与支付宝约定后配置返回；
-
             if (response.getGmtRefundPay() != null) {
                 refundResponse.setRefundTime(DateUtil.localDateTime(response.getGmtRefundPay()));
             }

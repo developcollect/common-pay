@@ -10,6 +10,20 @@ package com.developcollect.commonpay.pay;
 public interface IRefundDTO<SOURCE> extends IExtDto {
 
     /**
+     * 商户订单号
+     */
+    default String getOutTradeNo() {
+        return "";
+    }
+
+    /**
+     * 支付平台订单号
+     */
+    default String getTradeNo() {
+        return "";
+    }
+
+    /**
      * 商户退款单号
      *
      * @return 退款单号
