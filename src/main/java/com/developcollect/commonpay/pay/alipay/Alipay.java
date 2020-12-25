@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.*;
 import com.alipay.api.response.*;
@@ -492,6 +493,12 @@ public class Alipay extends AbstractPay {
 
 
     private AlipayClient getAlipayClient(AliPayConfig aliPayConfig) {
+        if (aliPayConfig.getAppCertContentSupplier() != null
+                && aliPayConfig.getAlipayCertContentSupplier() != null
+                && aliPayConfig.getAlipayRootCertContentSupplier() != null) {
+            return getCertClient(aliPayConfig);
+        }
+
         AlipayClient alipayClient = new DefaultAlipayClient(
                 aliPayConfig.isDebug() ? SANDBOX_SERVER_URL : SERVER_URL,
                 aliPayConfig.getAppId(),
@@ -505,6 +512,26 @@ public class Alipay extends AbstractPay {
         return alipayClient;
     }
 
+
+    private AlipayClient getCertClient(AliPayConfig aliPayConfig) {
+        try {
+            //构造client
+            CertAlipayRequest certAlipayRequest = new CertAlipayRequest();
+            certAlipayRequest.setServerUrl(aliPayConfig.isDebug() ? SANDBOX_SERVER_URL : SERVER_URL);
+            certAlipayRequest.setAppId(aliPayConfig.getAppId());
+            certAlipayRequest.setPrivateKey(aliPayConfig.getPrivateKey());
+            certAlipayRequest.setFormat(FORMAT);
+            certAlipayRequest.setCharset(aliPayConfig.getCharset());
+            certAlipayRequest.setSignType(aliPayConfig.getSignType());
+            certAlipayRequest.setCertContent(aliPayConfig.getAppCertContentSupplier().get());
+            certAlipayRequest.setAlipayPublicCertContent(aliPayConfig.getAlipayCertContentSupplier().get());
+            certAlipayRequest.setRootCertContent(aliPayConfig.getAlipayRootCertContentSupplier().get());
+
+            return new DefaultAlipayClient(certAlipayRequest);
+        } catch (AlipayApiException e) {
+            throw new PayException("创建支付宝支付对象失败", e);
+        }
+    }
 
 
 

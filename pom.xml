@@ -6,7 +6,7 @@
 
     <groupId>com.developcollect</groupId>
     <artifactId>common-pay</artifactId>
-    <version>2.1.4</version>
+    <version>2.1.5</version>
 
     <name>common-pay</name>
     <url>https://github.com/developcollect/common-pay</url>
@@ -45,7 +45,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <lombok.version>1.18.12</lombok.version>
-        <alipay-sdk-java.version>4.8.10.ALL</alipay-sdk-java.version>
+        <alipay-sdk-java.version>4.10.209.ALL</alipay-sdk-java.version>
         <junit.version>4.12</junit.version>
         <zxing.version>3.3.0</zxing.version>
         <dc-infra.version>1.0.6</dc-infra.version>
