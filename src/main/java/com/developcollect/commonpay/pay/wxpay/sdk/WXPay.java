@@ -39,7 +39,8 @@ public class WXPay {
         this.autoReport = autoReport;
         this.useSandbox = useSandbox;
         if (useSandbox) {
-            this.signType = WXPayConstants.SignType.MD5; // 沙箱环境
+            // 沙箱环境
+            this.signType = WXPayConstants.SignType.MD5;
         } else {
             this.signType = WXPayConstants.SignType.HMACSHA256;
         }
@@ -189,6 +190,18 @@ public class WXPay {
      */
     public Map<String, String> processResponseXml(String xmlStr) throws Exception {
         String RETURN_CODE = "return_code";
+        Map<String, String> respData = processResponseXmlNoSignatureValid(xmlStr);
+        String return_code = respData.get(RETURN_CODE);
+        if (return_code.equals(WXPayConstants.SUCCESS)) {
+            if (!this.isResponseSignatureValid(respData)) {
+                throw new Exception(String.format("Invalid sign value in XML: %s", xmlStr));
+            }
+        }
+        return respData;
+    }
+
+    public Map<String, String> processResponseXmlNoSignatureValid(String xmlStr) throws Exception {
+        String RETURN_CODE = "return_code";
         String return_code;
         Map<String, String> respData = WXPayUtil.xmlToMap(xmlStr);
         if (respData.containsKey(RETURN_CODE)) {
@@ -197,14 +210,8 @@ public class WXPay {
             throw new Exception(String.format("No `return_code` in XML: %s", xmlStr));
         }
 
-        if (return_code.equals(WXPayConstants.FAIL)) {
+        if (return_code.equals(WXPayConstants.FAIL) || return_code.equals(WXPayConstants.SUCCESS)) {
             return respData;
-        } else if (return_code.equals(WXPayConstants.SUCCESS)) {
-            if (this.isResponseSignatureValid(respData)) {
-                return respData;
-            } else {
-                throw new Exception(String.format("Invalid sign value in XML: %s", xmlStr));
-            }
         } else {
             throw new Exception(String.format("return_code value %s is invalid in XML: %s", return_code, xmlStr));
         }
@@ -724,6 +731,13 @@ public class WXPay {
         }
         String respXml = this.requestWithCert(url, this.fillTransferRequestData(reqData), connectTimeoutMs, readTimeoutMs);
         return this.processResponseXml(respXml);
+    }
+
+
+    public Map<String, String> getSandboxSignKey() throws Exception {
+        Map<String, String> map = new HashMap<>();
+        String respXml = this.requestWithoutCert(WXPayConstants.SANDBOX_GETSIGNKEY_URL_SUFFIX, this.fillRequestData(map), this.config.getHttpConnectTimeoutMs(), this.config.getHttpReadTimeoutMs());
+        return this.processResponseXmlNoSignatureValid(respXml);
     }
 
 } // end class
