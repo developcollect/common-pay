@@ -109,7 +109,7 @@ public class Alipay extends AbstractPay {
             alipayTradePayRequest.setBizContent(param);
             AlipayTradePayResponse response ;
 
-            if (hasCert(aliPayConfig)) {
+            if (aliPayConfig.hasCert()) {
                 response = alipayClient.certificateExecute(alipayTradePayRequest);
             }else{
                 response = alipayClient.execute(alipayTradePayRequest);
@@ -151,7 +151,7 @@ public class Alipay extends AbstractPay {
 
             AlipayTradePrecreateResponse response ;
 
-            if (hasCert(aliPayConfig)) {
+            if (aliPayConfig.hasCert()) {
                 response = alipayClient.certificateExecute(preCreateRequest);
             }else{
                 response = alipayClient.execute(preCreateRequest);
@@ -291,7 +291,7 @@ public class Alipay extends AbstractPay {
 
             AlipayTradeQueryResponse response ;
 
-            if (hasCert(payConfig)) {
+            if (payConfig.hasCert()) {
                 response = alipayClient.certificateExecute(request);
             }else{
                 response = alipayClient.execute(request);
@@ -326,7 +326,7 @@ public class Alipay extends AbstractPay {
 
             AlipayTradeRefundResponse alipayTradeRefundResponse;
 
-            if (hasCert(aliPayConfig)) {
+            if (aliPayConfig.hasCert()) {
                 alipayTradeRefundResponse = alipayClient.certificateExecute(refundRequest);
             }else{
                 alipayTradeRefundResponse = alipayClient.execute(refundRequest);
@@ -388,7 +388,7 @@ public class Alipay extends AbstractPay {
 
             request.setBizContent(JSONObject.toJSONString(paramMap));
             AlipayTradeFastpayRefundQueryResponse response ;
-            if (hasCert(aliPayConfig)) {
+            if (aliPayConfig.hasCert()) {
                 response = alipayClient.certificateExecute(request);
             }else{
                 response = alipayClient.execute(request);
@@ -433,7 +433,7 @@ public class Alipay extends AbstractPay {
             log.debug("支付宝转账参数: {}", param);
             transferRequest.setBizContent(param);
             AlipayFundTransUniTransferResponse response;
-            if (hasCert(aliPayConfig)) {
+            if (aliPayConfig.hasCert()) {
                 response = alipayClient.certificateExecute(transferRequest);
             }else{
                 response = alipayClient.execute(transferRequest);
@@ -491,7 +491,7 @@ public class Alipay extends AbstractPay {
 
             request.setBizContent(JSONObject.toJSONString(paramMap));
             AlipayFundTransOrderQueryResponse response;
-            if (hasCert(aliPayConfig)) {
+            if (aliPayConfig.hasCert()) {
                 response = alipayClient.certificateExecute(request);
             }else{
                 response = alipayClient.execute(request);
@@ -536,7 +536,7 @@ public class Alipay extends AbstractPay {
 
 
     private AlipayClient getAlipayClient(AliPayConfig aliPayConfig) {
-        if (hasCert(aliPayConfig)) {
+        if (aliPayConfig.hasCert()) {
             return getCertClient(aliPayConfig);
         }
 
@@ -575,12 +575,6 @@ public class Alipay extends AbstractPay {
         }
     }
 
-
-    private boolean hasCert(AliPayConfig aliPayConfig) {
-        return aliPayConfig.getAppCertContentSupplier() != null
-                && aliPayConfig.getAlipayCertContentSupplier() != null
-                && aliPayConfig.getAlipayRootCertContentSupplier() != null;
-    }
 
 
     @Override

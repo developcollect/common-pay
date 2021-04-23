@@ -62,4 +62,10 @@ public class AliPayConfig extends AbstractPayConfig {
      */
     private Supplier<String> alipayRootCertContentSupplier;
 
+
+    public boolean hasCert() {
+        return this.getAppCertContentSupplier() != null
+                && this.getAlipayCertContentSupplier() != null
+                && this.getAlipayRootCertContentSupplier() != null;
+    }
 }
