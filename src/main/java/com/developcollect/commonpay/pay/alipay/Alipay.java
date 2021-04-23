@@ -107,7 +107,13 @@ public class Alipay extends AbstractPay {
             String param = JSONObject.toJSONString(payData);
             log.debug("支付宝支付参数: {}", param);
             alipayTradePayRequest.setBizContent(param);
-            AlipayTradePayResponse response = alipayClient.execute(alipayTradePayRequest);
+            AlipayTradePayResponse response ;
+
+            if (hasCert(aliPayConfig)) {
+                response = alipayClient.certificateExecute(alipayTradePayRequest);
+            }else{
+                response = alipayClient.execute(alipayTradePayRequest);
+            }
 
             // 当前预下单请求生成的二维码码串，可以用二维码生成工具根据该码串值生成对应的二维码
             PayResponse payResponse = PayResponse.of(response);
@@ -142,7 +148,14 @@ public class Alipay extends AbstractPay {
             String param = JSONObject.toJSONString(payData);
             log.debug("支付宝支付参数: {}", param);
             preCreateRequest.setBizContent(param);
-            AlipayTradePrecreateResponse response = alipayClient.execute(preCreateRequest);
+
+            AlipayTradePrecreateResponse response ;
+
+            if (hasCert(aliPayConfig)) {
+                response = alipayClient.certificateExecute(preCreateRequest);
+            }else{
+                response = alipayClient.execute(preCreateRequest);
+            }
 
             //网关返回码,code 非10000接口调用失败，错误信息以subMsg属性返回
             //如code为10000，需要再次判断subCode是否为空，
@@ -276,7 +289,14 @@ public class Alipay extends AbstractPay {
 
             request.setBizContent(SerializeUtil.beanToJson(payQueryData));
 
-            AlipayTradeQueryResponse response = alipayClient.execute(request);
+            AlipayTradeQueryResponse response ;
+
+            if (hasCert(payConfig)) {
+                response = alipayClient.certificateExecute(request);
+            }else{
+                response = alipayClient.execute(request);
+            }
+
             if (!response.isSuccess()) {
                 throw new PayException(response.getSubCode(), response);
             }
@@ -304,7 +324,14 @@ public class Alipay extends AbstractPay {
             log.debug("支付宝退款参数: {}", param);
             refundRequest.setBizContent(param);
 
-            AlipayTradeRefundResponse alipayTradeRefundResponse = alipayClient.execute(refundRequest);
+            AlipayTradeRefundResponse alipayTradeRefundResponse;
+
+            if (hasCert(aliPayConfig)) {
+                alipayTradeRefundResponse = alipayClient.certificateExecute(refundRequest);
+            }else{
+                alipayTradeRefundResponse = alipayClient.execute(refundRequest);
+            }
+
             if (!alipayTradeRefundResponse.isSuccess()) {
                 throw new PayException(alipayTradeRefundResponse.getSubCode(), alipayTradeRefundResponse);
             }
@@ -360,7 +387,12 @@ public class Alipay extends AbstractPay {
             paramMap.put("out_request_no", refundDTO.getOutRefundNo());
 
             request.setBizContent(JSONObject.toJSONString(paramMap));
-            AlipayTradeFastpayRefundQueryResponse response = alipayClient.execute(request);
+            AlipayTradeFastpayRefundQueryResponse response ;
+            if (hasCert(aliPayConfig)) {
+                response = alipayClient.certificateExecute(request);
+            }else{
+                response = alipayClient.execute(request);
+            }
             if (!response.isSuccess()) {
                 log.debug("支付宝退款查询调用失败");
                 throw new PayException(response.getSubCode(), response);
@@ -400,7 +432,12 @@ public class Alipay extends AbstractPay {
             String param = JSONObject.toJSONString(transferData);
             log.debug("支付宝转账参数: {}", param);
             transferRequest.setBizContent(param);
-            AlipayFundTransUniTransferResponse response = alipayClient.execute(transferRequest);
+            AlipayFundTransUniTransferResponse response;
+            if (hasCert(aliPayConfig)) {
+                response = alipayClient.certificateExecute(transferRequest);
+            }else{
+                response = alipayClient.execute(transferRequest);
+            }
             if (!response.isSuccess()) {
                 throw new PayException(response.getSubCode(), response);
             }
@@ -453,7 +490,13 @@ public class Alipay extends AbstractPay {
             paramMap.put("order_id", transferDTO.getTransferNo());
 
             request.setBizContent(JSONObject.toJSONString(paramMap));
-            AlipayFundTransOrderQueryResponse response = alipayClient.execute(request);
+            AlipayFundTransOrderQueryResponse response;
+            if (hasCert(aliPayConfig)) {
+                response = alipayClient.certificateExecute(request);
+            }else{
+                response = alipayClient.execute(request);
+            }
+
             if (!response.isSuccess()) {
                 log.debug("支付宝转账查询调用失败");
                 throw new PayException(response.getSubCode(), response);
@@ -493,9 +536,7 @@ public class Alipay extends AbstractPay {
 
 
     private AlipayClient getAlipayClient(AliPayConfig aliPayConfig) {
-        if (aliPayConfig.getAppCertContentSupplier() != null
-                && aliPayConfig.getAlipayCertContentSupplier() != null
-                && aliPayConfig.getAlipayRootCertContentSupplier() != null) {
+        if (hasCert(aliPayConfig)) {
             return getCertClient(aliPayConfig);
         }
 
@@ -508,6 +549,7 @@ public class Alipay extends AbstractPay {
                 aliPayConfig.getPublicKey(),
                 aliPayConfig.getSignType()
         );
+
 
         return alipayClient;
     }
@@ -533,6 +575,12 @@ public class Alipay extends AbstractPay {
         }
     }
 
+
+    private boolean hasCert(AliPayConfig aliPayConfig) {
+        return aliPayConfig.getAppCertContentSupplier() != null
+                && aliPayConfig.getAlipayCertContentSupplier() != null
+                && aliPayConfig.getAlipayRootCertContentSupplier() != null;
+    }
 
 
     @Override
