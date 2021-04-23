@@ -18,9 +18,9 @@ public class MiscTest {
     public void test() {
         DefaultWXPayConfig wxSdkConfig = new DefaultWXPayConfig();
         // 三项都要填
-        wxSdkConfig.setMchId("111");
-        wxSdkConfig.setAppId("111");
-        wxSdkConfig.setKey("111");
+        wxSdkConfig.setMchId("1264316901");
+        wxSdkConfig.setAppId("wxc596191fde33119f");
+        wxSdkConfig.setKey("ccon08SVO4Ht7zLgiXjzhEsjQKawweo8");
 
         WXPay wxPay = new WXPay(wxSdkConfig, true, true);
         try {
